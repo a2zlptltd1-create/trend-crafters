@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Trend Crafters</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="glass sticky-nav">
+        <div class="container nav-wrapper">
+            <div class="logo">
+                <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
+                <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
+                <a href="#" class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contact Hero -->
+    <header class="hero" style="height: 40vh; background-image: url('https://images.unsplash.com/photo-1534536281715-e28d76689b4d?q=80&w=2000')">
+        <div class="hero-overlay" style="background: rgba(248, 249, 250, 0.7)"></div>
+        <div class="container hero-content">
+            <h1>GET IN <span class="highlight">TOUCH</span></h1>
+            <p>We'd love to hear from you. Send us a message!</p>
+        </div>
+    </header>
+
+    <!-- Contact Content -->
+    <section class="contact-section">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;">
+                <!-- Contact Form -->
+                <div class="glass" style="padding: 3rem; border-radius: 20px;">
+                    <h2 style="margin-bottom: 2rem;">Send a Message</h2>
+                    <form>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Full Name</label>
+                            <input type="text" placeholder="John Doe" style="width: 100%; padding: 1rem; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-primary);">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email Address</label>
+                            <input type="email" placeholder="john@example.com" style="width: 100%; padding: 1rem; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-primary);">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Message</label>
+                            <textarea rows="5" placeholder="How can we help you?" style="width: 100%; padding: 1rem; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-primary);"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                    </form>
+                </div>
+
+                <!-- Contact Info -->
+                <div style="padding-top: 2rem;">
+                    <h2 style="margin-bottom: 2rem;">Contact Information</h2>
+                    <div style="display: flex; gap: 1.5rem; margin-bottom: 2rem;">
+                        <i class="fa-solid fa-location-dot" style="font-size: 1.5rem; color: var(--accent-sage);"></i>
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Our Studio</h4>
+                            <p style="color: var(--text-muted);">202 Shaw Rd South San Francisco, CA 94080 USA</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1.5rem; margin-bottom: 2rem;">
+                        <i class="fa-solid fa-phone" style="font-size: 1.5rem; color: var(--accent-sage);"></i>
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Call Us</h4>
+                            <p style="color: var(--text-muted);">+1 (307) 400-8168</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1.5rem; margin-bottom: 2rem;">
+                        <i class="fa-solid fa-envelope" style="font-size: 1.5rem; color: var(--accent-sage);"></i>
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Email Us</h4>
+                            <p style="color: var(--text-muted);">info@trendcrafters.us</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
+                </div>
+                <p>Leading the way in modern apparel and lifestyle fashion.</p>
+                <div class="socials">
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="shop.html">Shirts</a></li>
+                    <li><a href="shop.html">Pants</a></li>
+                    <li><a href="shop.html">Shoes</a></li>
+                    <li><a href="shop.html">Caps</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="refund-policy.html">Refund & Returns</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-newsletter">
+                <h4>Stay Updated</h4>
+                <p>Join our newsletter for exclusive offers.</p>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Email Address">
+                    <button class="btn btn-primary">Join</button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Trend Crafters. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

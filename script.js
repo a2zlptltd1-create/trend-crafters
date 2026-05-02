@@ -71,83 +71,66 @@ document.querySelectorAll('section').forEach(section => {
     sectionObserver.observe(section);
 });
 
+
 // Hero Slider Logic
 const heroSlides = document.querySelectorAll('.hero-slide');
-const heroPrevBtn = document.querySelector('.hero-slider-btn.prev');
-const heroNextBtn = document.querySelector('.hero-slider-btn.next');
-const heroDotsContainer = document.querySelector('.hero-slider-dots');
+const heroDots = document.querySelectorAll('.hero-dot');
+const heroPrev = document.querySelector('.hero-prev');
+const heroNext = document.querySelector('.hero-next');
 
 if (heroSlides.length > 0) {
     let currentHeroSlide = 0;
-    let heroAutoPlay;
+    let heroInterval;
 
-    // Create dots
-    heroSlides.forEach((_, index) => {
-        const dot = document.createElement('div');
-        dot.classList.add('hero-dot');
-        if (index === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => {
-            goToHeroSlide(index);
-            resetHeroAutoPlay();
-        });
-        if(heroDotsContainer) {
-            heroDotsContainer.appendChild(dot);
-        }
-    });
-
-    const heroDots = document.querySelectorAll('.hero-dot');
-
-    function updateHeroSlider() {
+    function showHeroSlide(index) {
         heroSlides.forEach(slide => slide.classList.remove('active'));
         heroDots.forEach(dot => dot.classList.remove('active'));
-
-        heroSlides[currentHeroSlide].classList.add('active');
-        if(heroDots[currentHeroSlide]) heroDots[currentHeroSlide].classList.add('active');
-    }
-
-    function goToHeroSlide(index) {
+        
+        heroSlides[index].classList.add('active');
+        heroDots[index].classList.add('active');
         currentHeroSlide = index;
-        updateHeroSlider();
     }
 
     function nextHeroSlide() {
-        currentHeroSlide = (currentHeroSlide + 1) % heroSlides.length;
-        updateHeroSlider();
+        let nextIndex = (currentHeroSlide + 1) % heroSlides.length;
+        showHeroSlide(nextIndex);
     }
 
     function prevHeroSlide() {
-        currentHeroSlide = (currentHeroSlide - 1 + heroSlides.length) % heroSlides.length;
-        updateHeroSlider();
+        let prevIndex = (currentHeroSlide - 1 + heroSlides.length) % heroSlides.length;
+        showHeroSlide(prevIndex);
     }
 
-    if(heroNextBtn) {
-        heroNextBtn.addEventListener('click', () => {
+    function startHeroAutoPlay() {
+        heroInterval = setInterval(nextHeroSlide, 5000);
+    }
+
+    function resetHeroAutoPlay() {
+        clearInterval(heroInterval);
+        startHeroAutoPlay();
+    }
+
+    if (heroPrev && heroNext) {
+        heroNext.addEventListener('click', () => {
             nextHeroSlide();
             resetHeroAutoPlay();
         });
-    }
 
-    if(heroPrevBtn) {
-        heroPrevBtn.addEventListener('click', () => {
+        heroPrev.addEventListener('click', () => {
             prevHeroSlide();
             resetHeroAutoPlay();
         });
     }
 
-    function startHeroAutoPlay() {
-        heroAutoPlay = setInterval(nextHeroSlide, 5000);
-    }
-
-    function resetHeroAutoPlay() {
-        clearInterval(heroAutoPlay);
-        startHeroAutoPlay();
-    }
+    heroDots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            showHeroSlide(index);
+            resetHeroAutoPlay();
+        });
+    });
 
     startHeroAutoPlay();
 }
-
-// Features Slider removed – static features are displayed without slider functionality.
-
 
 // Product Slider Logic (Optional, safe if elements don't exist)
 const pSlider = document.querySelector('.product-slider');

@@ -33,7 +33,7 @@
                 <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="shop.html">Shop</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
@@ -169,6 +169,58 @@
                         <a href="shop.html" class="shop-link">View Collection <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section class="featured-products" style="background: white;">
+        <div class="container">
+            <h2 class="section-title">Best Selling <span class="highlight">Products</span></h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=1000" alt="Premium Black T-Shirt">
+                        <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
+                    </div>
+                    <div class="product-info">
+                        <h3>Urban Essential T-Shirt</h3>
+                        <p class="price">$29.99</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000" alt="Velocity Pro Sneakers">
+                        <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
+                    </div>
+                    <div class="product-info">
+                        <h3>Velocity Pro Sneakers</h3>
+                        <p class="price">$129.99</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1000" alt="Classic Denim Jeans">
+                        <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
+                    </div>
+                    <div class="product-info">
+                        <h3>Classic Denim Jeans</h3>
+                        <p class="price">$59.99</p>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-img">
+                        <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1000" alt="Premium Leather Jacket">
+                        <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
+                    </div>
+                    <div class="product-info">
+                        <h3>Premium Leather Jacket</h3>
+                        <p class="price">$199.99</p>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 4rem;">
+                <a href="shop.html" class="btn btn-primary">View Full Collection</a>
             </div>
         </div>
     </section>
@@ -349,10 +401,10 @@
             <div class="footer-links">
                 <h4>Shop</h4>
                 <ul>
-                    <li><a href="#">Shirts</a></li>
-                    <li><a href="#">Pants</a></li>
-                    <li><a href="#">Shoes</a></li>
-                    <li><a href="#">Caps</a></li>
+                    <li><a href="shop.html?filter=t-shirt">Shirts</a></li>
+                    <li><a href="shop.html?filter=pants">Pants</a></li>
+                    <li><a href="shop.html?filter=sneakers">Shoes</a></li>
+                    <li><a href="shop.html?filter=accessories">Caps</a></li>
                 </ul>
             </div>
             <div class="footer-links">
@@ -361,20 +413,20 @@
                     <li><a href="contact.html">Contact Us</a></li>
                     <li><a href="privacy-policy.html">Privacy Policy</a></li>
                     <li><a href="refund-policy.html">Refund & Returns</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#faq">FAQ</a></li>
                 </ul>
             </div>
             <div class="footer-newsletter">
                 <h4>Stay Updated</h4>
                 <p>Join our newsletter for exclusive offers.</p>
-                <div class="newsletter-form">
-                    <input type="email" placeholder="Email Address">
-                    <button class="btn btn-primary">Join</button>
-                </div>
+                <form action="https://formspree.io/f/info@trendcrafters.us" method="POST" class="newsletter-form">
+                    <input type="email" name="newsletter_email" placeholder="Email Address">
+                    <button type="submit" class="btn btn-primary">Join</button>
+                </form>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Trend Crafters. All rights reserved.</p>
+            <p>&copy; 2026 Trend Crafters. All rights reserved.</p>
         </div>
     </footer>
 

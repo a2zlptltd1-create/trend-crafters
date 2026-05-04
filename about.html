@@ -9,6 +9,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container top-bar-wrapper">
+            <div class="top-info">
+                <span><i class="fa-solid fa-phone"></i> +1 (307) 400-8168</span>
+                <span><i class="fa-solid fa-envelope"></i> info@trendcrafters.us</span>
+            </div>
+            <div class="top-promo">
+                <span>Free Shipping on Orders $500+</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Navigation -->
     <nav class="glass sticky-nav">
@@ -31,7 +43,7 @@
     </nav>
 
     <!-- About Hero -->
-    <header class="hero" style="height: 50vh; background-image: url('https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2000')">
+    <header class="hero visible" style="height: 50vh; background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2000')">
         <div class="hero-overlay"></div>
         <div class="container hero-content">
             <h1>OUR <span class="highlight">STORY</span></h1>
@@ -42,27 +54,33 @@
     <!-- About Content -->
     <section class="about-content">
         <div class="container">
-            <div style="max-width: 800px; margin: 0 auto; text-align: center;">
-                <h2 class="section-title">Who We <span class="highlight">Are</span></h2>
-                <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 2rem;">Founded in 2024, Trend Crafters was born out of a passion for high-quality apparel that doesn't compromise on style. We believe that what you wear is an extension of your identity, and our mission is to provide pieces that help you express your unique self.</p>
-                <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 3rem;">Our team of designers and craftsmen work tirelessly to ensure every item in our collection meets the highest standards of durability and comfort. From the finest fabrics to the smallest details, we care about the things that make a difference.</p>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; margin-top: 4rem;">
-                    <div>
-                        <i class="fa-solid fa-leaf" style="font-size: 2.5rem; color: var(--accent-sage); margin-bottom: 1rem;"></i>
-                        <h3>Sustainable</h3>
-                        <p>We use eco-friendly materials wherever possible.</p>
+            <div class="about-grid">
+                <div class="about-text">
+                    <span class="subtitle">Our Story</span>
+                    <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Trend <span class="highlight">Crafters</span> Vision</h2>
+                    <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1.5rem;">Trend Crafters was founded with a clear vision: to bridge the gap between quality products and businesses seeking reliable wholesale partners. We believe that every business deserves access to trending, high-quality products that help them grow.</p>
+                    <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 1.5rem;">Over the years, we've cultivated relationships with trusted manufacturers and suppliers worldwide, ensuring that our catalog represents the best in quality, design, and value. From home essentials to tech accessories, we source products that meet the evolving needs of modern consumers.</p>
+                    <p style="color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem;">Today, we're proud to serve hundreds of businesses across the United States, providing them with the products and support they need to thrive in competitive markets.</p>
+                    
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <i class="fa-solid fa-truck-fast"></i>
+                            <div>
+                                <h4>Global Sourcing</h4>
+                                <p>Best quality from top manufacturers.</p>
+                            </div>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <div>
+                                <h4>Trusted Partner</h4>
+                                <p>Serving hundreds of US businesses.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <i class="fa-solid fa-gem" style="font-size: 2.5rem; color: var(--accent-sage); margin-bottom: 1rem;"></i>
-                        <h3>Quality</h3>
-                        <p>Every piece is inspected for perfection.</p>
-                    </div>
-                    <div>
-                        <i class="fa-solid fa-truck-fast" style="font-size: 2.5rem; color: var(--accent-sage); margin-bottom: 1rem;"></i>
-                        <h3>Fast Delivery</h3>
-                        <p>Worldwide shipping right to your doorstep.</p>
-                    </div>
+                </div>
+                <div class="about-image">
+                    <img src="our-story.jpg" alt="Trend Crafters Story" id="our-story-img">
                 </div>
             </div>
         </div>
@@ -90,10 +108,10 @@
             <div class="footer-links">
                 <h4>Shop</h4>
                 <ul>
-                    <li><a href="shop.html">Shirts</a></li>
-                    <li><a href="shop.html">Pants</a></li>
-                    <li><a href="shop.html">Shoes</a></li>
-                    <li><a href="shop.html">Caps</a></li>
+                    <li><a href="shop.html?filter=t-shirt">Shirts</a></li>
+                    <li><a href="shop.html?filter=pants">Pants</a></li>
+                    <li><a href="shop.html?filter=sneakers">Shoes</a></li>
+                    <li><a href="shop.html?filter=accessories">Caps</a></li>
                 </ul>
             </div>
             <div class="footer-links">
@@ -102,7 +120,7 @@
                     <li><a href="contact.html">Contact Us</a></li>
                     <li><a href="privacy-policy.html">Privacy Policy</a></li>
                     <li><a href="refund-policy.html">Refund & Returns</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="index.html#faq">FAQ</a></li>
                 </ul>
             </div>
             <div class="footer-newsletter">
@@ -115,7 +133,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Trend Crafters. All rights reserved.</p>
+            <p>&copy; 2026 Trend Crafters. All rights reserved.</p>
         </div>
     </footer>
 

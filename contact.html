@@ -9,6 +9,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container top-bar-wrapper">
+            <div class="top-info">
+                <span><i class="fa-solid fa-phone"></i> +1 (307) 400-8168</span>
+                <span><i class="fa-solid fa-envelope"></i> info@trendcrafters.us</span>
+            </div>
+            <div class="top-promo">
+                <span>Free Shipping on Orders $500+</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Navigation -->
     <nav class="glass sticky-nav">
@@ -31,11 +43,11 @@
     </nav>
 
     <!-- Contact Hero -->
-    <header class="hero" style="height: 40vh; background-image: url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=2000')">
+    <header class="hero visible" style="height: 40vh; background-image: url('contact-bg.jpg')">
         <div class="hero-overlay"></div>
         <div class="container hero-content">
-            <h1>GET IN <span class="highlight">TOUCH</span></h1>
-            <p>We'd love to hear from you. Send us a message!</p>
+            <h1>CONTACT <span class="highlight">US</span></h1>
+            <p>Connect with our expert team for dedicated wholesale support and premium product solutions tailored to your business needs.</p>
         </div>
     </header>
 
@@ -43,23 +55,49 @@
     <section class="contact-section">
         <div class="container">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;">
-                <!-- Contact Form -->
+                <!-- Request Quote Form -->
                 <div class="glass" style="padding: 3rem; border-radius: 20px;">
-                    <h2 style="margin-bottom: 2rem;">Send a Message</h2>
-                    <form>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Full Name</label>
-                            <input type="text" placeholder="John Doe" style="width: 100%; padding: 1rem; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-primary);">
+                    <h2 style="margin-bottom: 2rem; color: var(--accent-navy);">Send a <span class="highlight">Message</span></h2>
+                    <form action="https://formspree.io/f/info@trendcrafters.us" method="POST" id="quote-request-form">
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Full Name *</label>
+                                <input type="text" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email *</label>
+                                <input type="email" name="email" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            </div>
                         </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email Address</label>
-                            <input type="email" placeholder="john@example.com" style="width: 100%; padding: 1rem; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-primary);">
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Phone *</label>
+                                <input type="tel" name="phone" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Company (optional)</label>
+                                <input type="text" name="company" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            </div>
                         </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Message</label>
-                            <textarea rows="5" placeholder="How can we help you?" style="width: 100%; padding: 1rem; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-primary);"></textarea>
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Product Name *</label>
+                                <input type="text" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Quantity *</label>
+                                <input type="number" name="quantity" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Message *</label>
+                            <textarea rows="5" name="message" required placeholder="Tell us more about your requirements..." style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;"></textarea>
+                        </div>
+                        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                            <input type="checkbox" name="is_wholesale" id="wholesale" style="width: 18px; height: 18px; cursor: pointer;">
+                            <label for="wholesale" style="font-size: 0.95rem; cursor: pointer;">This is a Wholesale/Bulk Inquiry</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Submit Quote Request</button>
                     </form>
                 </div>
 
@@ -129,10 +167,10 @@
             <div class="footer-links">
                 <h4>Shop</h4>
                 <ul>
-                    <li><a href="shop.html">Shirts</a></li>
-                    <li><a href="shop.html">Pants</a></li>
-                    <li><a href="shop.html">Shoes</a></li>
-                    <li><a href="shop.html">Caps</a></li>
+                    <li><a href="shop.html?filter=t-shirt">Shirts</a></li>
+                    <li><a href="shop.html?filter=pants">Pants</a></li>
+                    <li><a href="shop.html?filter=sneakers">Shoes</a></li>
+                    <li><a href="shop.html?filter=accessories">Caps</a></li>
                 </ul>
             </div>
             <div class="footer-links">
@@ -141,7 +179,7 @@
                     <li><a href="contact.html">Contact Us</a></li>
                     <li><a href="privacy-policy.html">Privacy Policy</a></li>
                     <li><a href="refund-policy.html">Refund & Returns</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="index.html#faq">FAQ</a></li>
                 </ul>
             </div>
             <div class="footer-newsletter">
@@ -154,7 +192,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Trend Crafters. All rights reserved.</p>
+            <p>&copy; 2026 Trend Crafters. All rights reserved.</p>
         </div>
     </footer>
 

@@ -3,11 +3,11 @@ const nav = document.querySelector('.sticky-nav');
 window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
         nav.style.padding = '0.5rem 0';
-        nav.style.background = 'rgba(248, 249, 250, 0.95)';
-        nav.style.boxShadow = '0 5px 20px rgba(0,0,0,0.05)';
+        nav.style.background = 'var(--accent-navy)';
+        nav.style.boxShadow = '0 5px 20px rgba(0,0,0,0.2)';
     } else {
         nav.style.padding = '1rem 0';
-        nav.style.background = 'rgba(255, 255, 255, 0.05)';
+        nav.style.background = 'var(--accent-navy)';
         nav.style.boxShadow = 'none';
     }
 });
@@ -168,6 +168,32 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+// Checkout Order Submission
+const checkoutForm = document.getElementById('checkout-form');
+const successModal = document.getElementById('success-modal');
+
+if (checkoutForm) {
+    checkoutForm.addEventListener('submit', (e) => {
+        // Populate hidden field with cart details
+        const orderDetailsInput = document.getElementById('order-details-hidden');
+        if (orderDetailsInput) {
+            let details = "Order Items:\n";
+            cart.forEach(item => {
+                details += `- ${item.name} (Qty: ${item.quantity}) - $${(item.price * item.quantity).toFixed(2)}\n`;
+            });
+            details += `\nTotal: ${document.getElementById('summary-total').textContent}`;
+            orderDetailsInput.value = details;
+        }
+
+        // The form will now submit to Formspree naturally
+        // We will show the success modal after a slight delay to allow submission
+        setTimeout(() => {
+            localStorage.removeItem('trendCraftersCart');
+            if (successModal) successModal.classList.add('active');
+        }, 1000);
+    });
+}
+
 // Scroll Reveal Animation (Intersection Observer)
 const observerOptions = {
     threshold: 0.1,
@@ -319,4 +345,50 @@ faqQuestions.forEach(question => {
         item.classList.toggle('active');
     });
 });
+
+// Product Filtering Logic (Shop Page)
+const filterButtons = document.querySelectorAll('.filter-btn');
+const shopProductCards = document.querySelectorAll('.product-card');
+
+if (filterButtons.length > 0) {
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const filterValue = button.getAttribute('data-filter');
+
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // Filter products
+            shopProductCards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                
+                if (filterValue === 'all' || category === filterValue) {
+                    card.classList.remove('hidden');
+                    // Add a small delay for fade-in effect
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'scale(1)';
+                    }, 10);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        card.classList.add('hidden');
+                    }, 400); // Match transition time in CSS
+                }
+            });
+        });
+    });
+
+    // Handle URL Filter (for footer links)
+    const urlParams = new URLSearchParams(window.location.search);
+    const filterParam = urlParams.get('filter');
+    if (filterParam) {
+        const targetBtn = document.querySelector(`.filter-btn[data-filter="${filterParam}"]`);
+        if (targetBtn) {
+            setTimeout(() => targetBtn.click(), 500); // Small delay to ensure everything is loaded
+        }
+    }
+}
 

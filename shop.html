@@ -9,6 +9,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container top-bar-wrapper">
+            <div class="top-info">
+                <span><i class="fa-solid fa-phone"></i> +1 (307) 400-8168</span>
+                <span><i class="fa-solid fa-envelope"></i> info@trendcrafters.us</span>
+            </div>
+            <div class="top-promo">
+                <span>Free Shipping on Orders $500+</span>
+            </div>
+        </div>
+    </div>
 
     <!-- Navigation -->
     <nav class="glass sticky-nav">
@@ -31,7 +43,7 @@
     </nav>
 
     <!-- Shop Hero -->
-    <header class="hero" style="height: 40vh; background-image: url('shop-bg-png.png')">
+    <header class="hero visible" style="height: 40vh; background-image: url('shop-bg-png.png')">
         <div class="hero-overlay"></div>
         <div class="container hero-content">
             <h1>OUR <span class="highlight">COLLECTION</span></h1>
@@ -42,12 +54,19 @@
     <!-- Shop Content -->
     <section class="products">
         <div class="container">
-            <div class="shop-filters">
-                <!-- Filters could go here -->
+            <div class="shop-filters-container" style="margin-bottom: 3rem;">
+                <div class="filter-group">
+                    <button class="filter-btn active" data-filter="all">All Collection</button>
+                    <button class="filter-btn" data-filter="t-shirt">T-Shirts</button>
+                    <button class="filter-btn" data-filter="pants">Pants</button>
+                    <button class="filter-btn" data-filter="sneakers">Sneakers</button>
+                    <button class="filter-btn" data-filter="accessories">Accessories</button>
+                </div>
             </div>
-            <div class="product-grid">
+
+            <div class="product-grid" id="main-product-grid">
                 <!-- Row 1 -->
-                <div class="product-card">
+                <div class="product-card" data-category="t-shirt">
                     <div class="product-img">
                         <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=1000" alt="Premium Black T-Shirt">
                         <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
@@ -57,7 +76,7 @@
                         <p class="price">$29.99</p>
                     </div>
                 </div>
-                <div class="product-card">
+                <div class="product-card" data-category="pants">
                     <div class="product-img">
                         <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1000" alt="Denim Pants">
                         <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
@@ -67,7 +86,7 @@
                         <p class="price">$59.99</p>
                     </div>
                 </div>
-                <div class="product-card">
+                <div class="product-card" data-category="sneakers">
                     <div class="product-img">
                         <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000" alt="Pro Sneaker">
                         <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
@@ -77,7 +96,7 @@
                         <p class="price">$129.99</p>
                     </div>
                 </div>
-                <div class="product-card">
+                <div class="product-card" data-category="accessories">
                     <div class="product-img">
                         <img src="https://images.unsplash.com/photo-1534215754734-18e55d13e346?q=80&w=1000" alt="Signature Cap">
                         <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
@@ -88,7 +107,7 @@
                     </div>
                 </div>
                 <!-- Row 2 -->
-                <div class="product-card">
+                <div class="product-card" data-category="t-shirt">
                     <div class="product-img">
                         <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1000" alt="White Tee">
                         <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
@@ -98,7 +117,7 @@
                         <p class="price">$24.99</p>
                     </div>
                 </div>
-                <div class="product-card">
+                <div class="product-card" data-category="accessories">
                     <div class="product-img">
                         <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1000" alt="Leather Jacket">
                         <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
@@ -108,7 +127,7 @@
                         <p class="price">$199.99</p>
                     </div>
                 </div>
-                <div class="product-card">
+                <div class="product-card" data-category="sneakers">
                     <div class="product-img">
                         <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?q=80&w=1000" alt="Running Shoes">
                         <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
@@ -118,6 +137,7 @@
                         <p class="price">$89.99</p>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     </section>
@@ -226,10 +246,10 @@
             <div class="footer-links">
                 <h4>Shop</h4>
                 <ul>
-                    <li><a href="shop.html">Shirts</a></li>
-                    <li><a href="shop.html">Pants</a></li>
-                    <li><a href="shop.html">Shoes</a></li>
-                    <li><a href="shop.html">Caps</a></li>
+                    <li><a href="shop.html?filter=t-shirt">Shirts</a></li>
+                    <li><a href="shop.html?filter=pants">Pants</a></li>
+                    <li><a href="shop.html?filter=sneakers">Shoes</a></li>
+                    <li><a href="shop.html?filter=accessories">Caps</a></li>
                 </ul>
             </div>
             <div class="footer-links">
@@ -238,7 +258,7 @@
                     <li><a href="contact.html">Contact Us</a></li>
                     <li><a href="privacy-policy.html">Privacy Policy</a></li>
                     <li><a href="refund-policy.html">Refund & Returns</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="index.html#faq">FAQ</a></li>
                 </ul>
             </div>
             <div class="footer-newsletter">
@@ -251,7 +271,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 Trend Crafters. All rights reserved.</p>
+            <p>&copy; 2026 Trend Crafters. All rights reserved.</p>
         </div>
     </footer>
 

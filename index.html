@@ -40,6 +40,7 @@
             </ul>
             <div class="nav-icons">
                 <a href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
+                <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
                 <a href="#" class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></a>
             </div>
         </div>
@@ -48,7 +49,7 @@
     <!-- Hero Section Slider -->
     <header id="home" class="hero hero-slider">
         <!-- Slide 1 -->
-        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1489987707023-af0825dad1c3?q=80&w=1600')">
+        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=1600')">
             <div class="hero-overlay"></div>
             <div class="container hero-content animate-fade">
                 <span class="subtitle">Global Wholesale Partner</span>
@@ -334,6 +335,11 @@
                     <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
                 </div>
                 <p>Leading the way in modern apparel and lifestyle fashion.</p>
+                <div class="footer-contact-info" style="margin-bottom: 1.5rem;">
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-location-dot" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> 202 Shaw Rd South San Francisco, CA 94080</p>
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-phone" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> +1 (307) 400-8168</p>
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-envelope" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> info@trendcrafters.us</p>
+                </div>
                 <div class="socials">
                     <a href="#"><i class="fa-brands fa-facebook"></i></a>
                     <a href="#"><i class="fa-brands fa-instagram"></i></a>
@@ -371,6 +377,49 @@
             <p>&copy; 2024 Trend Crafters. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay"></div>
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <div class="close-cart"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="cart-body">
+            <!-- Cart items will be injected here -->
+            <div class="cart-empty-msg">Your cart is empty.</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="total-amount">$0.00</span>
+            </div>
+            <a href="checkout.html" class="btn btn-primary checkout-btn">Checkout Now</a>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div>
+    <div class="mobile-menu">
+        <div class="mobile-menu-header">
+            <div class="logo">
+                <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
+            </div>
+            <div class="close-mobile-menu"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="mobile-menu-footer">
+            <div class="mobile-menu-contact">
+                <p><i class="fa-solid fa-phone"></i> +1 (307) 400-8168</p>
+                <p><i class="fa-solid fa-envelope"></i> info@trendcrafters.us</p>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

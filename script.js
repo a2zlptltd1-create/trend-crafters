@@ -12,33 +12,148 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Cart Counter Logic
-let cartCount = 0;
+// Shopping Cart Logic
+let cart = JSON.parse(localStorage.getItem('trendCraftersCart')) || [];
+const cartIcon = document.querySelector('.cart-icon');
+const cartSidebar = document.querySelector('.cart-sidebar');
+const cartOverlay = document.querySelector('.cart-overlay');
+const closeCartBtn = document.querySelector('.close-cart');
 const cartCountDisplay = document.querySelector('.cart-count');
+const cartBody = document.querySelector('.cart-body');
+const totalAmountDisplay = document.querySelector('.total-amount');
 const addToCartBtns = document.querySelectorAll('.add-to-cart');
 
+function updateCartUI() {
+    // Update count
+    const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+    if (cartCountDisplay) cartCountDisplay.textContent = totalItems;
+
+    // Update body
+    if (cartBody) {
+        if (cart.length === 0) {
+            cartBody.innerHTML = '<div class="cart-empty-msg">Your cart is empty.</div>';
+        } else {
+            cartBody.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-img">
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <p class="price">${item.price} x ${item.quantity}</p>
+                        <span class="cart-item-remove" onclick="removeFromCart(${index})">Remove</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // Update total
+    const total = cart.reduce((acc, item) => {
+        const price = parseFloat(item.price.replace('$', ''));
+        return acc + (price * item.quantity);
+    }, 0);
+    if (totalAmountDisplay) totalAmountDisplay.textContent = `$${total.toFixed(2)}`;
+
+    // Save to local storage
+    localStorage.setItem('trendCraftersCart', JSON.stringify(cart));
+}
+
+function openCart() {
+    if (cartSidebar) cartSidebar.classList.add('active');
+    if (cartOverlay) cartOverlay.classList.add('active');
+}
+
+function closeCart() {
+    if (cartSidebar) cartSidebar.classList.remove('active');
+    if (cartOverlay) cartOverlay.classList.remove('active');
+}
+
+function addToCart(name, price, image) {
+    const existingItem = cart.find(item => item.name === name);
+    if (existingItem) {
+        existingItem.quantity++;
+    } else {
+        cart.push({ name, price, image, quantity: 1 });
+    }
+    updateCartUI();
+    openCart();
+}
+
+window.removeFromCart = function(index) {
+    cart.splice(index, 1);
+    updateCartUI();
+};
+
+if (cartIcon) {
+    cartIcon.addEventListener('click', (e) => {
+        e.preventDefault();
+        openCart();
+    });
+}
+
+if (closeCartBtn) {
+    closeCartBtn.addEventListener('click', closeCart);
+}
+
+if (cartOverlay) {
+    cartOverlay.addEventListener('click', closeCart);
+}
+
 addToCartBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        cartCount++;
-        cartCountDisplay.textContent = cartCount;
-        
-        // Simple feedback animation
-        btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-        btn.style.background = '#10b981'; // Success Green
-        
-        setTimeout(() => {
-            btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i>';
-            btn.style.background = 'white';
-        }, 2000);
+    btn.addEventListener('click', (e) => {
+        const card = btn.closest('.product-card');
+        if (card) {
+            const name = card.querySelector('h3').textContent;
+            const price = card.querySelector('.price').textContent;
+            const image = card.querySelector('img').src;
+            
+            addToCart(name, price, image);
+
+            // Simple feedback animation
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            btn.style.background = '#10b981'; // Success Green
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = '';
+            }, 2000);
+        }
     });
 });
 
-// Mobile Menu Placeholder (can be expanded)
+// Initialize UI
+updateCartUI();
+
+// Mobile Menu Logic
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-mobileMenuBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Mobile Menu would open here in a full implementation!');
-});
+const mobileMenu = document.querySelector('.mobile-menu');
+const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+const closeMobileMenuBtn = document.querySelector('.close-mobile-menu');
+
+function openMobileMenu() {
+    if (mobileMenu) mobileMenu.classList.add('active');
+    if (mobileMenuOverlay) mobileMenuOverlay.classList.add('active');
+}
+
+function closeMobileMenu() {
+    if (mobileMenu) mobileMenu.classList.remove('active');
+    if (mobileMenuOverlay) mobileMenuOverlay.classList.remove('active');
+}
+
+if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        openMobileMenu();
+    });
+}
+
+if (closeMobileMenuBtn) {
+    closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
+}
+
+if (mobileMenuOverlay) {
+    mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+}
 
 // Smooth Scroll for Navigation Links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {

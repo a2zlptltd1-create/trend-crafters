@@ -118,16 +118,6 @@
                         <p class="price">$89.99</p>
                     </div>
                 </div>
-                <div class="product-card">
-                    <div class="product-img">
-                        <img src="https://images.unsplash.com/photo-1576871337622-98d48d766e29?q=80&w=1000" alt="Beanie">
-                        <button class="add-to-cart"><i class="fa-solid fa-cart-plus"></i></button>
-                    </div>
-                    <div class="product-info">
-                        <h3>Winter Cozy Beanie</h3>
-                        <p class="price">$19.99</p>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -169,6 +159,51 @@
         </div>
     </section>
 
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked <span class="highlight">Questions</span></h2>
+            <div class="faq-accordion">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What are your Minimum Order Quantities (MOQs)?</h3>
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Our MOQ is 400 units for all products to qualify for wholesale pricing.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What is the typical delivery time?</h3>
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Delivery time depends on order size, but we ensure fast and reliable shipping, typically ranging from 7-14 business days.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What payment terms do you offer?</h3>
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept secure online payments, credit cards, and bank transfers for bulk orders.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Can I get product samples before placing a bulk order?</h3>
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we offer sample orders so you can check quality and fit before committing to a bulk purchase.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container footer-grid">
@@ -177,6 +212,11 @@
                     <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
                 </div>
                 <p>Leading the way in modern apparel and lifestyle fashion.</p>
+                <div class="footer-contact-info" style="margin-bottom: 1.5rem;">
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-location-dot" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> 202 Shaw Rd South San Francisco, CA 94080</p>
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-phone" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> +1 (307) 400-8168</p>
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-envelope" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> info@trendcrafters.us</p>
+                </div>
                 <div class="socials">
                     <a href="#"><i class="fa-brands fa-facebook"></i></a>
                     <a href="#"><i class="fa-brands fa-instagram"></i></a>
@@ -214,6 +254,49 @@
             <p>&copy; 2024 Trend Crafters. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay"></div>
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <div class="close-cart"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="cart-body">
+            <!-- Cart items will be injected here -->
+            <div class="cart-empty-msg">Your cart is empty.</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="total-amount">$0.00</span>
+            </div>
+            <a href="checkout.html" class="btn btn-primary checkout-btn">Checkout Now</a>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay"></div>
+    <div class="mobile-menu">
+        <div class="mobile-menu-header">
+            <div class="logo">
+                <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
+            </div>
+            <div class="close-mobile-menu"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html" class="active">Shop</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="mobile-menu-footer">
+            <div class="mobile-menu-contact">
+                <p><i class="fa-solid fa-phone"></i> +1 (307) 400-8168</p>
+                <p><i class="fa-solid fa-envelope"></i> info@trendcrafters.us</p>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

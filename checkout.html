@@ -1,24 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | Trend Crafters</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&family=Inter:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Top Bar -->
     <div class="top-bar">
         <div class="container top-bar-wrapper">
             <div class="top-info">
-                <span><i class="fa-solid fa-phone"></i> +1 (307) 400-8168</span>
-                <span><i class="fa-solid fa-envelope"></i> info@trendcrafters.us</span>
+                <span><i class="fa-solid fa-phone"></i> <a href="tel:+13074008168"
+                        style="color: inherit; text-decoration: none;">+1 (307) 400-8168</a></span>
+                <span><i class="fa-solid fa-envelope"></i> <a href="mailto:info@trendcrafters.us"
+                        style="color: inherit; text-decoration: none;">info@trendcrafters.us</a></span>
             </div>
             <div class="top-promo">
                 <span>Free Shipping on Orders $500+</span>
+                <a href="contact.html#quote-request-form" class="btn get-quote-btn" style="margin-left: 1.5rem; text-decoration: none;">Get
+                    Quote</a>
             </div>
+
         </div>
     </div>
 
@@ -26,7 +35,8 @@
     <nav class="glass sticky-nav">
         <div class="container nav-wrapper">
             <div class="logo">
-                <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
+                <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span
+                        class="crafters">CRAFTERS</span></a>
             </div>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
@@ -36,7 +46,8 @@
             </ul>
             <div class="nav-icons">
                 <a href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
-                <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
+                <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i><span
+                        class="cart-count">0</span></a>
                 <a href="#" class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></a>
             </div>
         </div>
@@ -45,13 +56,15 @@
     <section class="checkout-section" style="padding-top: 120px;">
         <div class="container">
             <h1 class="section-title">Secure <span class="highlight">Checkout</span></h1>
-            
+
             <div class="checkout-grid">
                 <!-- Shipping Form -->
                 <div class="checkout-form-container">
                     <div class="glass checkout-card">
                         <h3><i class="fa-solid fa-truck"></i> Shipping Information</h3>
-                        <form action="https://formspree.io/f/info@trendcrafters.us" method="POST" id="checkout-form">
+                        <form action="https://api.web3forms.com/submit" method="POST" id="checkout-form">
+                            <input type="hidden" name="access_key" value="51ffeffb-889e-4934-a4a5-17a90dbfa209">
+                            <input type="hidden" name="subject" value="New Wholesale Order - Trend Crafters">
                             <input type="hidden" name="order_details" id="order-details-hidden">
                             <div class="form-row">
                                 <div class="form-group">
@@ -69,7 +82,8 @@
                             </div>
                             <div class="form-group">
                                 <label>Address</label>
-                                <input type="text" name="address" required placeholder="Street address, apartment, suite, etc.">
+                                <input type="text" name="address" required
+                                    placeholder="Street address, apartment, suite, etc.">
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
@@ -85,10 +99,11 @@
                                 <label>Phone</label>
                                 <input type="tel" name="phone" required placeholder="+1 (307) 400-8168">
                             </div>
-                            
+
                             <h3 style="margin-top: 2rem;"><i class="fa-solid fa-credit-card"></i> Payment Method</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Payment will be handled securely via bank transfer or credit card after order review.</p>
-                            
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Payment will be
+                                handled securely via bank transfer or credit card after order review.</p>
+
                             <button type="submit" class="btn btn-primary place-order-btn">Place Order</button>
                         </form>
                     </div>
@@ -123,10 +138,12 @@
 
     <!-- Success Modal (Hidden by default) -->
     <div id="success-modal" class="cart-overlay">
-        <div class="glass" style="max-width: 500px; margin: 15vh auto; padding: 4rem; text-align: center; border-radius: 30px;">
+        <div class="glass"
+            style="max-width: 500px; margin: 15vh auto; padding: 4rem; text-align: center; border-radius: 30px; position: relative;">
             <i class="fa-solid fa-circle-check" style="font-size: 5rem; color: #10b981; margin-bottom: 2rem;"></i>
             <h2 style="margin-bottom: 1rem; color: var(--accent-navy);">Order Placed!</h2>
-            <p style="margin-bottom: 2rem; color: var(--text-muted);">Thank you for your order. We will contact you shortly to confirm your wholesale order details.</p>
+            <p style="margin-bottom: 2rem; color: var(--text-muted);">Thank you for your order. We will contact you
+                shortly to confirm your wholesale order details.</p>
             <a href="index.html" class="btn btn-primary">Back to Home</a>
         </div>
     </div>
@@ -171,55 +188,98 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
+                </div>
+                <p>Leading the way in modern apparel and lifestyle fashion.</p>
+                <div class="footer-contact-info" style="margin-bottom: 1.5rem;">
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-location-dot" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> 202 Shaw Rd South San Francisco, CA 94080</p>
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-phone" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> +1 (307) 400-8168</p>
+                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-envelope" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> info@trendcrafters.us</p>
+                </div>
+                <div class="socials">
+                    <a href="https://facebook.com/trendcrafters" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://instagram.com/trendcrafters" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/@raahpk" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="shop.html?filter=t-shirt">Shirts</a></li>
+                    <li><a href="shop.html?filter=pants">Pants</a></li>
+                    <li><a href="shop.html?filter=sneakers">Shoes</a></li>
+                    <li><a href="shop.html?filter=accessories">Caps</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="refund-policy.html">Refund & Returns</a></li>
+                    <li><a href="index.html#faq">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-newsletter">
+                <h4>Stay Updated</h4>
+                <p>Join our newsletter for exclusive offers.</p>
+                <form action="https://api.web3forms.com/submit" method="POST" class="newsletter-form">
+                    <input type="hidden" name="access_key" value="51ffeffb-889e-4934-a4a5-17a90dbfa209">
+                    <input type="hidden" name="subject" value="New Newsletter Subscriber">
+                    <input type="email" name="email" placeholder="Email Address" required>
+                    <button type="submit" class="btn btn-primary">Join</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Trend Crafters. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script src="script.js"></script>
     <script>
-        // Specific logic for checkout page
-        document.addEventListener('DOMContentLoaded', () => {
+        // Specific logic for checkout page summary rendering
+        function renderSummary() {
             const itemsContainer = document.getElementById('checkout-items');
             const subtotalEl = document.getElementById('summary-subtotal');
             const totalEl = document.getElementById('summary-total');
-            const checkoutForm = document.getElementById('checkout-form');
-            const successModal = document.getElementById('success-modal');
+            const cart = JSON.parse(localStorage.getItem('trendCraftersCart')) || [];
 
-            function renderSummary() {
-                const cart = JSON.parse(localStorage.getItem('trendCraftersCart')) || [];
-                
-                if (cart.length === 0) {
-                    itemsContainer.innerHTML = '<p>Your cart is empty.</p>';
-                    return;
-                }
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+                subtotalEl.textContent = '$0.00';
+                totalEl.textContent = '$0.00';
+                return;
+            }
 
-                itemsContainer.innerHTML = cart.map(item => `
-                    <div class="summary-item">
-                        <img src="${item.image}" alt="${item.name}">
-                        <div class="summary-item-info">
-                            <h4>${item.name}</h4>
-                            <span>Qty: ${item.quantity}</span>
-                        </div>
-                        <span class="summary-item-price">${item.price}</span>
+            itemsContainer.innerHTML = cart.map(item => `
+                <div class="summary-item">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="summary-item-info">
+                        <h4>${item.name}</h4>
+                        <span>Qty: ${item.quantity}</span>
                     </div>
-                `).join('');
+                    <span class="summary-item-price">${item.price}</span>
+                </div>
+            `).join('');
 
-                const total = cart.reduce((acc, item) => {
-                    const price = parseFloat(item.price.replace('$', ''));
-                    return acc + (price * item.quantity);
-                }, 0);
+            const total = cart.reduce((acc, item) => {
+                const price = parseFloat(item.price.replace('$', ''));
+                return acc + (price * item.quantity);
+            }, 0);
 
-                subtotalEl.textContent = `$${total.toFixed(2)}`;
-                totalEl.textContent = `$${total.toFixed(2)}`;
-            }
+            subtotalEl.textContent = `$${total.toFixed(2)}`;
+            totalEl.textContent = `$${total.toFixed(2)}`;
+        }
 
-            if (checkoutForm) {
-                checkoutForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    // Simulate order placement
-                    localStorage.removeItem('trendCraftersCart');
-                    successModal.classList.add('active');
-                });
-            }
-
-            renderSummary();
-        });
+        document.addEventListener('DOMContentLoaded', renderSummary);
     </script>
 </body>
+
+
 </html>

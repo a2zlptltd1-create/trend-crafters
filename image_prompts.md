@@ -25,6 +25,12 @@ This document contains curated image prompts designed to enhance the professiona
   > Sleek modern sneakers and leather boots on a clean podium, minimalist aesthetic, side profile view, soft shadows, luxury footwear photography.
 - **Caps/Accessories Category:**
   > A collection of premium snapback caps and beanies arranged artistically, high-quality embroidery details visible, professional studio lighting, clean aesthetic.
+- **Denim Collection:**
+  > High-quality dark wash denim jeans, neatly folded, focus on copper rivets and orange contrast stitching, professional textile photography, minimalist background.
+- **Premium Outerwear (Jackets):**
+  > A premium black leather biker jacket on a minimalist stand, soft grain texture visible, high-end fashion lighting, deep blacks and rich shadows, 8k resolution.
+- **Sunglasses & Accessories:**
+  > Modern designer sunglasses on a reflective glass surface, soft sunlight reflection, cinematic depth of field, luxury lifestyle aesthetic, high-end commercial shot.
 
 ---
 
@@ -47,6 +53,8 @@ This document contains curated image prompts designed to enhance the professiona
   > A professional and friendly customer support team working in a modern, brightly lit office with navy blue and yellow branding elements, blurred background, high-end corporate photography.
 - **Fashion Model (Male/Female):**
   > A stylish model wearing premium streetwear (navy hoodie and denim), walking in a modern urban environment during golden hour, soft sunlight, high-end fashion lookbook style.
+- **Wholesale Warehouse (Logistics):**
+  > A wide shot of a modern, clean, and organized clothing warehouse with rows of high-quality apparel on hangers, warm lighting, professional logistics environment, 4k.
 
 ---
 

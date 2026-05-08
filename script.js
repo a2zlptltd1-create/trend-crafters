@@ -53,6 +53,20 @@ function updateCartUI() {
     }, 0);
     if (totalAmountDisplay) totalAmountDisplay.textContent = `$${total.toFixed(2)}`;
 
+    // Disable/Hide checkout button if empty
+    const checkoutBtns = document.querySelectorAll('.checkout-btn');
+    checkoutBtns.forEach(btn => {
+        if (cart.length === 0) {
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            btn.style.filter = 'grayscale(1)';
+        } else {
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+            btn.style.filter = 'none';
+        }
+    });
+
     // Save to local storage
     localStorage.setItem('trendCraftersCart', JSON.stringify(cart));
 }
@@ -147,9 +161,16 @@ async function handleFormSubmit(form, successCallback) {
         const result = await response.json();
 
         if (response.status === 200) {
-            if (successCallback) successCallback(result);
+            if (successCallback) successCallback(result, form);
         } else {
-            alert(result.message || "Something went wrong!");
+            const errorMsg = form.querySelector('.newsletter-msg') || form.querySelector('.form-error');
+            if (errorMsg) {
+                errorMsg.textContent = result.message || "Something went wrong!";
+                errorMsg.style.color = "#ef4444";
+                errorMsg.style.display = "block";
+            } else {
+                alert(result.message || "Something went wrong!");
+            }
         }
     } catch (error) {
         console.error(error);
@@ -209,15 +230,96 @@ if (contactForm) {
 document.querySelectorAll('.newsletter-form').forEach(form => {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        handleFormSubmit(form, (data) => {
-            alert("Success! You have joined our newsletter.");
-            form.reset();
+        handleFormSubmit(form, (data, currentForm) => {
+            const msgContainer = currentForm.querySelector('.newsletter-msg');
+            if (msgContainer) {
+                msgContainer.textContent = "Success! You have joined our newsletter.";
+                msgContainer.classList.add('active');
+                currentForm.reset();
+                setTimeout(() => {
+                    msgContainer.classList.remove('active');
+                }, 5000);
+            } else {
+                alert("Success! You have joined our newsletter.");
+                currentForm.reset();
+            }
         });
     });
 });
 
 // Initialize UI
-updateCartUI();
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartUI();
+    
+    // Checkout Summary Logic (for checkout page)
+    if (window.location.pathname.includes('checkout.html')) {
+        renderCheckoutSummary();
+    }
+});
+
+// Search Modal Logic
+const searchIcon = document.querySelector('.nav-icons a i.fa-magnifying-glass').parentElement;
+const searchOverlay = document.querySelector('.search-overlay');
+const closeSearch = document.querySelector('.close-search');
+
+if (searchIcon && searchOverlay) {
+    searchIcon.addEventListener('click', (e) => {
+        e.preventDefault();
+        searchOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+}
+
+if (closeSearch && searchOverlay) {
+    closeSearch.addEventListener('click', () => {
+        searchOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+}
+
+// Checkout Summary Rendering
+function renderCheckoutSummary() {
+    const mainGrid = document.getElementById('checkout-main-grid');
+    const emptyView = document.getElementById('empty-checkout-view');
+    const itemsContainer = document.getElementById('checkout-items');
+    const subtotalEl = document.getElementById('summary-subtotal');
+    const totalEl = document.getElementById('summary-total');
+    
+    if (!mainGrid || !emptyView) return;
+
+    const currentCart = JSON.parse(localStorage.getItem('trendCraftersCart')) || [];
+
+    if (currentCart.length === 0) {
+        mainGrid.style.display = 'none';
+        emptyView.style.display = 'block';
+        return;
+    }
+
+    mainGrid.style.display = 'grid';
+    emptyView.style.display = 'none';
+
+    if (itemsContainer) {
+        itemsContainer.innerHTML = currentCart.map(item => `
+            <div class="summary-item">
+                <img src="${item.image}" alt="${item.name}">
+                <div class="summary-item-info">
+                    <h4>${item.name}</h4>
+                    <span>Qty: ${item.quantity}</span>
+                </div>
+                <span class="summary-item-price">${item.price}</span>
+            </div>
+        `).join('');
+    }
+
+    const total = currentCart.reduce((acc, item) => {
+        const price = parseFloat(item.price.replace('$', ''));
+        return acc + (price * item.quantity);
+    }, 0);
+
+    if (subtotalEl) subtotalEl.textContent = `$${total.toFixed(2)}`;
+    if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
+}
+
 
 // Mobile Menu Logic
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');

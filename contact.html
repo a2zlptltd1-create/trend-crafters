@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>
     <!-- Top Bar -->
@@ -28,7 +29,7 @@
     <nav class="glass sticky-nav">
         <div class="container nav-wrapper">
             <div class="logo">
-                <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
+                <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
             </div>
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
@@ -72,13 +73,13 @@
                             </div>
                             <div class="form-group" style="margin-bottom: 1.5rem;">
                                 <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email *</label>
-                                <input type="email" name="email" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                                <input type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group" style="margin-bottom: 1.5rem;">
                                 <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Phone *</label>
-                                <input type="tel" name="phone" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                                <input type="tel" name="phone" required pattern="[+]?[0-9]{10,15}" title="Please enter a valid phone number (10-15 digits, optional leading +)" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
                             </div>
                             <div class="form-group" style="margin-bottom: 1.5rem;">
                                 <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Company (optional)</label>
@@ -156,7 +157,7 @@
         <div class="container footer-grid">
             <div class="footer-brand">
                 <div class="logo">
-                    <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
+                    <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
                 </div>
                 <p>Leading the way in modern apparel and lifestyle fashion.</p>
                                 <div class="footer-contact-info" style="margin-bottom: 1.5rem;">
@@ -196,8 +197,9 @@
                     <input type="hidden" name="access_key" value="51ffeffb-889e-4934-a4a5-17a90dbfa209">
 
                     <input type="hidden" name="subject" value="New Newsletter Subscriber">
-                    <input type="email" name="email" placeholder="Email Address" required>
+                    <input type="email" name="email" placeholder="Email Address" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address">
                     <button type="submit" class="btn btn-primary">Join</button>
+                    <div class="newsletter-msg"></div>
                 </form>
 
             </div>
@@ -232,7 +234,7 @@
     <div class="mobile-menu">
         <div class="mobile-menu-header">
             <div class="logo">
-                <span class="trend">TREND</span><span class="crafters">CRAFTERS</span>
+                <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
             </div>
             <div class="close-mobile-menu"><i class="fa-solid fa-xmark"></i></div>
         </div>
@@ -246,6 +248,24 @@
             <div class="mobile-menu-contact">
                 <p><i class="fa-solid fa-phone"></i> +1 (307) 400-8168</p>
                 <p><i class="fa-solid fa-envelope"></i> info@trendcrafters.us</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-overlay">
+        <div class="search-modal glass animate-fade">
+            <div class="close-search"><i class="fa-solid fa-xmark"></i></div>
+            <h2>Search <span class="highlight">Collection</span></h2>
+            <div class="search-form-wrapper">
+                <input type="text" id="global-search-input" placeholder="What are you looking for?">
+                <button id="global-search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+            <div class="search-suggestions">
+                <span>Try:</span>
+                <a href="shop.html?filter=t-shirt">T-Shirts</a>
+                <a href="shop.html?filter=pants">Pants</a>
+                <a href="shop.html?filter=sneakers">Sneakers</a>
             </div>
         </div>
     </div>

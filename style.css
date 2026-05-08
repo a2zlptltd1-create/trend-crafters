@@ -1724,3 +1724,138 @@ section.visible {
 .product-card.hidden {
     display: none;
 }
+
+/* Newsletter Success Message */
+.newsletter-msg {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--accent-yellow);
+    opacity: 0;
+    transition: var(--transition-smooth);
+    display: none;
+}
+
+.newsletter-msg.active {
+    opacity: 1;
+    display: block;
+}
+
+/* Extra Utility for Hidden State */
+.hidden {
+    display: none !important;
+}
+
+/* Cart Button Transition */
+.checkout-btn {
+    transition: var(--transition-smooth);
+}
+
+/* Search Modal Overlay */
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 77, 112, 0.4);
+    backdrop-filter: blur(15px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition-smooth);
+}
+
+.search-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.search-modal {
+    width: 90%;
+    max-width: 800px;
+    padding: 4rem;
+    border-radius: 40px;
+    position: relative;
+    text-align: center;
+}
+
+.close-search {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.search-form-wrapper {
+    display: flex;
+    gap: 1rem;
+    margin: 3rem 0;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.search-form-wrapper input {
+    flex: 1;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    background: transparent;
+}
+
+.search-form-wrapper button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent-navy);
+    color: white;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.search-form-wrapper button:hover {
+    transform: scale(1.1);
+}
+
+.search-suggestions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.search-suggestions span {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.search-suggestions a {
+    color: var(--accent-navy);
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+    transition: var(--transition-smooth);
+}
+
+.search-suggestions a:hover {
+    border-color: var(--accent-yellow);
+    color: var(--accent-yellow);
+}
+
+/* Empty Checkout Styles */
+#empty-checkout-view {
+    animation: fadeIn 0.5s ease;
+}
+
+#empty-checkout-view i {
+    display: block;
+}
+
+

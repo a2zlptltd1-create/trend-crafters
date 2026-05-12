@@ -7,43 +7,18 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="canonical" href="https://trendcrafters.us/contact.html">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://trendcrafters.us/contact.html">
+    <meta property="og:title" content="Contact Us | Trend Crafters">
+    <meta property="og:description" content="Connect with our expert team for dedicated wholesale support and premium product solutions.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200">
 </head>
 <body>
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="container top-bar-wrapper">
-            <div class="top-info">
-                <span><i class="fa-solid fa-phone"></i> <a href="tel:+13074008168" style="color: inherit; text-decoration: none;">+1 (307) 400-8168</a></span>
-                <span><i class="fa-solid fa-envelope"></i> <a href="mailto:info@trendcrafters.us" style="color: inherit; text-decoration: none;">info@trendcrafters.us</a></span>
-            </div>
-            <div class="top-promo">
-                <span>Free Shipping on Orders $500+</span>
-                                <a href="contact.html#quote-request-form" class="btn get-quote-btn" style="margin-left: 1.5rem; text-decoration: none;">Get Quote</a>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="glass sticky-nav">
-        <div class="container nav-wrapper">
-            <div class="logo">
-                <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="shop.html">Shop</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="contact.html" class="active">Contact</a></li>
-            </ul>
-            <div class="nav-icons">
-                <a href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
-                <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
-                <a href="#" class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></a>
-            </div>
-        </div>
-    </nav>
+    <!-- Shared Header Placeholder -->
+    <div id="header-placeholder"></div>
 
     <!-- Contact Hero -->
     <header class="hero visible" style="height: 40vh; background-image: url('contact-bg.jpg')">
@@ -59,52 +34,52 @@
         <div class="container">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;">
                 <!-- Request Quote Form -->
-                <div class="glass" style="padding: 3rem; border-radius: 20px;">
-                    <h2 style="margin-bottom: 2rem; color: var(--accent-navy);">Send a <span class="highlight">Message</span></h2>
+                <div class="glass form-card">
+                    <h2 class="form-group-mb">Send a <span class="highlight">Message</span></h2>
                     <form action="https://api.web3forms.com/submit" method="POST" id="quote-request-form">
                         <input type="hidden" name="access_key" value="51ffeffb-889e-4934-a4a5-17a90dbfa209">
 
                         <input type="hidden" name="subject" value="New Quote Request - Trend Crafters">
                         <input type="hidden" name="from_name" value="Trend Crafters Contact Form">
                         <div class="form-row">
-                            <div class="form-group" style="margin-bottom: 1.5rem;">
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Full Name *</label>
-                                <input type="text" name="full_name" required placeholder="Full Name" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            <div class="form-group form-group-mb">
+                                <label class="label-bold">Full Name *</label>
+                                <input type="text" name="full_name" required placeholder="Full Name" class="form-control-custom">
                             </div>
-                            <div class="form-group" style="margin-bottom: 1.5rem;">
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email *</label>
-                                <input type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group" style="margin-bottom: 1.5rem;">
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Phone *</label>
-                                <input type="tel" name="phone" required pattern="[+]?[0-9]{10,15}" title="Please enter a valid phone number (10-15 digits, optional leading +)" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
-                            </div>
-                            <div class="form-group" style="margin-bottom: 1.5rem;">
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Company (optional)</label>
-                                <input type="text" name="company" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            <div class="form-group form-group-mb">
+                                <label class="label-bold">Email *</label>
+                                <input type="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address" class="form-control-custom">
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group" style="margin-bottom: 1.5rem;">
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Product Name *</label>
-                                <input type="text" name="product_name" required placeholder="Product Name" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            <div class="form-group form-group-mb">
+                                <label class="label-bold">Phone *</label>
+                                <input type="tel" name="phone" required pattern="[+]?[0-9]{10,15}" title="Please enter a valid phone number (10-15 digits, optional leading +)" class="form-control-custom">
                             </div>
-                            <div class="form-group" style="margin-bottom: 1.5rem;">
-                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Quantity *</label>
-                                <input type="number" name="quantity" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+                            <div class="form-group form-group-mb">
+                                <label class="label-bold">Company (optional)</label>
+                                <input type="text" name="company" class="form-control-custom">
                             </div>
                         </div>
-                        <div class="form-group" style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Message *</label>
-                            <textarea rows="5" name="message" required placeholder="Tell us more about your requirements..." style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;"></textarea>
+                        <div class="form-row">
+                            <div class="form-group form-group-mb">
+                                <label class="label-bold">Product Name *</label>
+                                <input type="text" name="product_name" required placeholder="Product Name" class="form-control-custom">
+                            </div>
+                            <div class="form-group form-group-mb">
+                                <label class="label-bold">Quantity *</label>
+                                <input type="number" name="quantity" required class="form-control-custom">
+                            </div>
                         </div>
-                        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem;">
-                            <input type="checkbox" name="is_wholesale" id="wholesale" style="width: 18px; height: 18px; cursor: pointer;">
-                            <label for="wholesale" style="font-size: 0.95rem; cursor: pointer;">This is a Wholesale/Bulk Inquiry</label>
+                        <div class="form-group form-group-mb">
+                            <label class="label-bold">Message *</label>
+                            <textarea rows="5" name="message" required placeholder="Tell us more about your requirements..." class="form-control-custom"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">Submit Quote Request</button>
+                        <div class="form-group-mb flex-center-gap">
+                            <input type="checkbox" name="is_wholesale" id="wholesale" class="checkbox-custom">
+                            <label for="wholesale" class="cursor-pointer">This is a Wholesale/Bulk Inquiry</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 p-1rem font-1.1">Submit Quote Request</button>
                     </form>
                 </div>
 
@@ -152,124 +127,11 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer-grid">
-            <div class="footer-brand">
-                <div class="logo">
-                    <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
-                </div>
-                <p>Leading the way in modern apparel and lifestyle fashion.</p>
-                                <div class="footer-contact-info" style="margin-bottom: 1.5rem;">
-                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-location-dot" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> 202 Shaw Rd South San Francisco, CA 94080</p>
-                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-phone" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> +1 (307) 400-8168</p>
-                    <p style="margin-bottom: 0.5rem;"><i class="fa-solid fa-envelope" style="color: var(--accent-yellow); margin-right: 0.8rem;"></i> info@trendcrafters.us</p>
-                </div>
-                <div class="socials">
-                    <a href="https://facebook.com/trendcrafters" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="https://instagram.com/trendcrafters" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@raahpk" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-                </div>
+    <!-- Shared Footer Placeholder -->
+    <div id="footer-placeholder"></div>
 
-            </div>
-            <div class="footer-links">
-                <h4>Shop</h4>
-                <ul>
-                    <li><a href="shop.html?filter=t-shirt">Shirts</a></li>
-                    <li><a href="shop.html?filter=pants">Pants</a></li>
-                    <li><a href="shop.html?filter=sneakers">Shoes</a></li>
-                    <li><a href="shop.html?filter=accessories">Caps</a></li>
-                </ul>
-            </div>
-            <div class="footer-links">
-                <h4>Support</h4>
-                <ul>
-                    <li><a href="contact.html">Contact Us</a></li>
-                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="refund-policy.html">Refund & Returns</a></li>
-                    <li><a href="index.html#faq">FAQ</a></li>
-                </ul>
-            </div>
-            <div class="footer-newsletter">
-                <h4>Stay Updated</h4>
-                <p>Join our newsletter for exclusive offers.</p>
-                <form action="https://api.web3forms.com/submit" method="POST" class="newsletter-form">
-                    <input type="hidden" name="access_key" value="51ffeffb-889e-4934-a4a5-17a90dbfa209">
-
-                    <input type="hidden" name="subject" value="New Newsletter Subscriber">
-                    <input type="email" name="email" placeholder="Email Address" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address">
-                    <button type="submit" class="btn btn-primary">Join</button>
-                    <div class="newsletter-msg"></div>
-                </form>
-
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Trend Crafters. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Cart Sidebar -->
-    <div class="cart-overlay"></div>
-    <div class="cart-sidebar">
-        <div class="cart-header">
-            <h2>Your Cart</h2>
-            <div class="close-cart"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <div class="cart-body">
-            <!-- Cart items will be injected here -->
-            <div class="cart-empty-msg">Your cart is empty.</div>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total:</span>
-                <span class="total-amount">$0.00</span>
-            </div>
-            <a href="checkout.html" class="btn btn-primary checkout-btn">Checkout Now</a>
-        </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div class="mobile-menu-overlay"></div>
-    <div class="mobile-menu">
-        <div class="mobile-menu-header">
-            <div class="logo">
-                <a href="index.html" style="text-decoration: none;"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
-            </div>
-            <div class="close-mobile-menu"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        <ul class="mobile-nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="shop.html">Shop</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html" class="active">Contact</a></li>
-        </ul>
-        <div class="mobile-menu-footer">
-            <div class="mobile-menu-contact">
-                <p><i class="fa-solid fa-phone"></i> +1 (307) 400-8168</p>
-                <p><i class="fa-solid fa-envelope"></i> info@trendcrafters.us</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search Modal -->
-    <div class="search-overlay">
-        <div class="search-modal glass animate-fade">
-            <div class="close-search"><i class="fa-solid fa-xmark"></i></div>
-            <h2>Search <span class="highlight">Collection</span></h2>
-            <div class="search-form-wrapper">
-                <input type="text" id="global-search-input" placeholder="What are you looking for?">
-                <button id="global-search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-            </div>
-            <div class="search-suggestions">
-                <span>Try:</span>
-                <a href="shop.html?filter=t-shirt">T-Shirts</a>
-                <a href="shop.html?filter=pants">Pants</a>
-                <a href="shop.html?filter=sneakers">Sneakers</a>
-            </div>
-        </div>
-    </div>
-
+    <!-- Scripts -->
+    <script src="components.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

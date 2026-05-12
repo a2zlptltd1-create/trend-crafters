@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Crafters | Partner Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body class="dashboard-wrapper" style="background-color: #f8fafc;">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo">
+                <a href="index.html" class="no-decoration"><span class="trend" style="color: white;">TREND</span><span class="crafters" style="color: var(--accent-gold);">CRAFTERS</span></a>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active" data-tab="portal-dashboard"><i class="fa-solid fa-house-user"></i> <span>Dashboard</span></a></li>
+            <li><a href="#" data-tab="portal-orders"><i class="fa-solid fa-file-invoice"></i> <span>My Wholesale Orders</span></a></li>
+            <li><a href="#" data-tab="portal-profile"><i class="fa-solid fa-address-card"></i> <span>Business Profile</span></a></li>
+        </ul>
+        <div style="padding: 1.5rem; margin-top: auto;">
+            <a href="#" onclick="logoutUser()" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.9rem;"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="dashboard-header">
+            <h1 id="portal-title">Welcome back, <span id="partner-name">...</span></h1>
+            <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
+                <span style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted);" id="partner-company">...</span>
+                <div style="width: 40px; height: 40px; background: var(--accent-navy); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">P</div>
+            </div>
+        </header>
+
+        <!-- Portal Dashboard View -->
+        <div id="portal-dashboard" class="tab-content active">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon icon-blue"><i class="fa-solid fa-box-open"></i></div>
+                    <div class="metric-info">
+                        <h4>Active Orders</h4>
+                        <div class="value" id="stat-active-orders">0</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon icon-gold"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="metric-info">
+                        <h4>Pending Payment</h4>
+                        <div class="value" id="stat-pending-payment">0</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="metric-info">
+                        <h4>Completed</h4>
+                        <div class="value" id="stat-completed-orders">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header">
+                    <h3>Recent Invoices</h3>
+                    <a href="#" onclick="switchPortalTab('portal-orders')" style="font-size: 0.85rem; color: var(--accent-navy); font-weight: 600;">View All Orders</a>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portal-recent-orders">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- My Orders View -->
+        <div id="portal-orders" class="tab-content">
+            <div class="content-card">
+                <div class="card-header">
+                    <h3>My Wholesale Order History</h3>
+                </div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Order ID</th>
+                            <th>Product Details</th>
+                            <th>Quantity</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portal-full-order-list">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Business Profile View -->
+        <div id="portal-profile" class="tab-content">
+            <div class="content-card" style="max-width: 800px;">
+                <div class="card-header"><h3>Account Information</h3></div>
+                <div class="dashboard-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <label style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Full Name</label>
+                            <p style="font-weight: 700; margin-bottom: 1.5rem;" id="prof-name"></p>
+                            
+                            <label style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Business Email</label>
+                            <p style="font-weight: 700; margin-bottom: 1.5rem;" id="prof-email"></p>
+
+                            <label style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Phone Number</label>
+                            <p style="font-weight: 700;" id="prof-phone"></p>
+                        </div>
+                        <div>
+                            <label style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Company Name</label>
+                            <p style="font-weight: 700; margin-bottom: 1.5rem;" id="prof-business"></p>
+
+                            <label style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Business Type</label>
+                            <p style="font-weight: 700; margin-bottom: 1.5rem;" id="prof-type"></p>
+
+                            <label style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Country</label>
+                            <p style="font-weight: 700;" id="prof-country"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="products.js"></script>
+    <script src="orders.js"></script>
+    <script>
+        // Portal Protection & Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('tc_current_user'));
+            
+            if (!user || user.status !== 'approved') {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update Profile Info
+            document.getElementById('partner-name').textContent = user.fullname.split(' ')[0];
+            document.getElementById('partner-company').textContent = user.businessName;
+
+            document.getElementById('prof-name').textContent = user.fullname;
+            document.getElementById('prof-email').textContent = user.email;
+            document.getElementById('prof-phone').textContent = user.phone;
+            document.getElementById('prof-business').textContent = user.businessName;
+            document.getElementById('prof-type').textContent = user.businessType;
+            document.getElementById('prof-country').textContent = user.country;
+
+            renderPortalOrders(user.id);
+        });
+
+        function renderPortalOrders(userId) {
+            const allOrders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+            const myOrders = allOrders.filter(o => o.customerId === userId);
+            
+            const recentList = document.getElementById('portal-recent-orders');
+            const fullList = document.getElementById('portal-full-order-list');
+            const products = JSON.parse(localStorage.getItem('tc_products')) || [];
+
+            // Stats
+            document.getElementById('stat-active-orders').textContent = myOrders.length;
+            document.getElementById('stat-pending-payment').textContent = myOrders.filter(o => o.status === 'pending').length;
+            document.getElementById('stat-completed-orders').textContent = myOrders.filter(o => o.status === 'paid').length;
+
+            if (myOrders.length === 0) {
+                const emptyRow = '<tr><td colspan="7" style="text-align:center; padding:3rem; color:var(--text-muted);">No orders generated for your account yet.</td></tr>';
+                if (recentList) recentList.innerHTML = emptyRow;
+                if (fullList) fullList.innerHTML = emptyRow;
+                return;
+            }
+
+            const getHtml = (o) => {
+                const p = products.find(prod => prod.id === o.productId);
+                return `
+                    <tr>
+                        <td><div class="user-info-main">#${o.id}</div></td>
+                        <td>${p ? p.name : 'Custom Package'}</td>
+                        <td>$${parseFloat(o.total).toFixed(2)}</td>
+                        <td><span class="badge badge-${o.status}">${o.status}</span></td>
+                        <td><a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Complete Payment</a></td>
+                    </tr>
+                `;
+            };
+
+            const getFullHtml = (o) => {
+                const p = products.find(prod => prod.id === o.productId);
+                return `
+                    <tr>
+                        <td>${new Date(o.createdAt).toLocaleDateString()}</td>
+                        <td><div class="user-info-main">#${o.id}</div></td>
+                        <td>${p ? p.name : 'Custom Item'}</td>
+                        <td>${o.quantity} units</td>
+                        <td style="font-weight: 700;">$${parseFloat(o.total).toFixed(2)}</td>
+                        <td><span class="badge badge-${o.status}">${o.status}</span></td>
+                        <td><a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Pay Now</a></td>
+                    </tr>
+                `;
+            };
+
+            if (recentList) recentList.innerHTML = myOrders.slice(0, 5).map(getHtml).join('');
+            if (fullList) fullList.innerHTML = myOrders.map(getFullHtml).join('');
+        }
+
+        // Tab Switching Logic
+        const tabs = document.querySelectorAll('.sidebar-menu a');
+        const contents = document.querySelectorAll('.tab-content');
+        const portalTitle = document.getElementById('portal-title');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = tab.getAttribute('data-tab');
+                switchPortalTab(target);
+            });
+        });
+
+        function switchPortalTab(targetId) {
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${targetId}"]`).classList.add('active');
+
+            contents.forEach(c => c.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+
+            // Update Header Title (Keep name if on dashboard)
+            if (targetId !== 'portal-dashboard') {
+                const titleMap = {
+                    'portal-orders': 'My Wholesale Orders',
+                    'portal-profile': 'Business Profile'
+                };
+                portalTitle.textContent = titleMap[targetId];
+            } else {
+                const user = JSON.parse(localStorage.getItem('tc_current_user'));
+                portalTitle.innerHTML = `Welcome back, <span>${user.fullname.split(' ')[0]}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

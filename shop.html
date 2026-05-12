@@ -30,7 +30,7 @@
     </header>
 
     <!-- Shop Content -->
-    <section class="products">
+    <section class="products visible">
         <div class="container">
             <div class="shop-filters-container" style="margin-bottom: 3rem;">
                 <div class="filter-group">
@@ -206,6 +206,42 @@
 
     <!-- Scripts -->
     <script src="components.js"></script>
+    <script src="auth.js"></script>
     <script src="script.js"></script>
+    <script src="products.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('main-product-grid');
+            if (!grid) return;
+
+            // Clear static content
+            grid.innerHTML = '';
+
+            const products = B2B_PRODUCTS.products.filter(p => p.status === 'active');
+
+            if (products.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-muted);"><h3>Catalog coming soon.</h3><p>Our team is currently updating the wholesale inventory.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div class="product-card" data-id="${p.id}" data-category="${p.category.toLowerCase()}">
+                    <div class="product-img">
+                        <img src="${p.image}" alt="${p.name}">
+                        <div class="product-badge" style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-navy); color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">MOQ: ${p.moq}</div>
+                    </div>
+                    <div class="product-info">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <h3>${p.name}</h3>
+                            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">SKU: ${p.sku}</span>
+                        </div>
+                        <p class="price">$${parseFloat(p.basePrice).toFixed(2)}</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 1rem 0;">${p.description}</p>
+                        <button onclick="alert('Inquiry sent! Our admin will generate your custom checkout link.')" class="btn btn-primary" style="width: 100%;">Inquire for Bulk Order</button>
+                    </div>
+                </div>
+            `).join('');
+        });
+    </script>
 </body>
 </html>

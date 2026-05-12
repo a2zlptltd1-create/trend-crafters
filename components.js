@@ -27,13 +27,17 @@ const SHARED_COMPONENTS = {
                 </div>
                 <ul class="nav-links">
                     <li><a href="index.html" id="nav-home">Home</a></li>
-                    <li><a href="shop.html" id="nav-shop">Shop</a></li>
+                    <li><a href="shop.html" id="nav-shop">Product Catalog</a></li>
                     <li><a href="about.html" id="nav-about">About</a></li>
                     <li><a href="contact.html" id="nav-contact">Contact</a></li>
                 </ul>
                 <div class="nav-icons">
                     <a href="#" id="global-search-trigger"><i class="fa-solid fa-magnifying-glass"></i></a>
-                    <a href="#" class="cart-icon"><i class="fa-solid fa-cart-shopping"></i><span class="cart-count">0</span></a>
+                    <div id="nav-auth-ctas" style="display: flex; gap: 1rem; align-items: center;">
+                        <!-- Will be populated by JS based on Auth state -->
+                        <a href="login.html" class="btn btn-outline btn-sm" style="padding: 0.5rem 1rem;">Login</a>
+                        <a href="signup.html" class="btn btn-primary btn-sm" style="padding: 0.5rem 1rem;">Apply</a>
+                    </div>
                     <a href="#" class="mobile-menu-btn" id="mobile-menu-trigger"><i class="fa-solid fa-bars"></i></a>
                 </div>
             </div>
@@ -179,6 +183,22 @@ function injectComponents() {
             const el = document.getElementById(id);
             if (el) el.classList.add('active');
         });
+    }
+
+    updateNavAuth();
+}
+
+function updateNavAuth() {
+    const authCtas = document.getElementById('nav-auth-ctas');
+    if (!authCtas) return;
+
+    const user = JSON.parse(localStorage.getItem('tc_current_user'));
+
+    if (user) {
+        authCtas.innerHTML = `
+            <a href="portal.html" style="font-size: 0.85rem; font-weight: 600; color: white; text-decoration: none;">Hi, ${user.fullname.split(' ')[0]}</a>
+            <a href="#" onclick="logoutUser()" class="btn btn-outline btn-sm" style="padding: 0.4rem 0.8rem; border-color: white; color: white;">Logout</a>
+        `;
     }
 }
 

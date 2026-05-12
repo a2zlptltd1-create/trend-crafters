@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wholesale Login | Trend Crafters</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body style="background-color: var(--bg-primary); padding-top: 5rem;">
+
+    <div class="container">
+        <div class="auth-card animate-fade">
+            <div class="auth-header">
+                <div class="logo" style="margin-bottom: 1.5rem;">
+                    <a href="index.html" class="no-decoration"><span class="trend" style="color: var(--accent-navy);">TREND</span><span class="crafters" style="color: var(--accent-gold);">CRAFTERS</span></a>
+                </div>
+                <h2>Partner Login</h2>
+                <p>Welcome back to the Trend Crafters portal.</p>
+            </div>
+
+            <!-- Status Messages (Hidden by default) -->
+            <div id="auth-message" style="display: none; margin-bottom: 1.5rem; padding: 1rem; border-radius: 4px; font-size: 0.9rem;">
+                <p></p>
+            </div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Work Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="name@company.com" required>
+                </div>
+
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label for="password" style="margin-bottom: 0;">Password</label>
+                        <a href="#" style="font-size: 0.8rem; color: var(--accent-navy);">Forgot?</a>
+                    </div>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="remember">
+                    <label for="remember" style="margin-bottom: 0; font-weight: 500; font-size: 0.85rem;">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Login to Portal
+                </button>
+
+                <div class="auth-footer">
+                    New business partner? <a href="signup.html">Apply for Access</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="components.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

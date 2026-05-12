@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend Crafters | Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo">
+                    <a href="index.html" class="no-decoration"><span class="trend" style="color: white;">TREND</span><span class="crafters" style="color: var(--accent-gold);">CRAFTERS</span></a>
+                </div>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" data-tab="dashboard"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+                <li><a href="#" data-tab="customers"><i class="fa-solid fa-users"></i> <span>Customers</span></a></li>
+                <li><a href="#" data-tab="products"><i class="fa-solid fa-boxes-stacked"></i> <span>Products</span></a></li>
+                <li><a href="#" data-tab="generate-order"><i class="fa-solid fa-file-invoice-dollar"></i> <span>Generate Order</span></a></li>
+                <li><a href="#" data-tab="orders"><i class="fa-solid fa-cart-shopping"></i> <span>Orders</span></a></li>
+                <li><a href="#" data-tab="payment-settings"><i class="fa-solid fa-credit-card"></i> <span>Payment Settings</span></a></li>
+                <li><a href="#" data-tab="admin-settings"><i class="fa-solid fa-user-gear"></i> <span>Admin Settings</span></a></li>
+            </ul>
+            <div style="padding: 1.5rem;">
+                <a href="#" onclick="logoutUser()" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.9rem;"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="dashboard-header">
+                <h1 id="tab-title">Dashboard Overview</h1>
+                <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
+                    <span id="admin-name" style="font-weight: 600; font-size: 0.9rem;">System Admin</span>
+                    <div style="width: 40px; height: 40px; background: var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">A</div>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <div id="dashboard" class="tab-content active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon icon-blue"><i class="fa-solid fa-users"></i></div>
+                        <div class="metric-info">
+                            <h4>Total Users</h4>
+                            <div class="value" id="stat-total-users">0</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon icon-gold"><i class="fa-solid fa-clock"></i></div>
+                        <div class="metric-info">
+                            <h4>Pending Approvals</h4>
+                            <div class="value" id="stat-pending">0</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon icon-green"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="metric-info">
+                            <h4>Approved Customers</h4>
+                            <div class="value" id="stat-approved">0</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon icon-purple"><i class="fa-solid fa-receipt"></i></div>
+                        <div class="metric-info">
+                            <h4>Total Orders</h4>
+                            <div class="value" id="stat-total-orders">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Recent Orders</h3>
+                        <a href="#" onclick="switchTab('orders')" style="font-size: 0.85rem; color: var(--accent-navy); font-weight: 600;">View All</a>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-orders-list">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Customers View -->
+            <div id="customers" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Partner Directory</h3>
+                        <div style="display: flex; gap: 1rem;">
+                            <div class="search-bar" style="max-width: 250px;">
+                                <input type="text" id="customer-search" placeholder="Search customers..." style="width: 100%; padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 4px;">
+                            </div>
+                            <select id="customer-status-filter" class="form-control" style="width: 150px; padding: 0.5rem;">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="deactivated">Deactivated</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Partner Details</th>
+                                <th>Business Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-user-list">
+                            <!-- Populated by auth.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Products View -->
+            <div id="products" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Product Management</h3>
+                        <button onclick="B2B_PRODUCTS.toggleModal(true); document.getElementById('product-form').reset(); document.getElementById('p-id').value=''; document.getElementById('product-modal-title').textContent='Add New Product';" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-plus"></i> Add Product
+                        </button>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Product Details</th>
+                                <th>SKU</th>
+                                <th>Category</th>
+                                <th>Base Price</th>
+                                <th>MOQ</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-product-list">
+                            <!-- Populated by products.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Generate Order View -->
+            <div id="generate-order" class="tab-content">
+                <div class="content-card" style="max-width: 800px; margin: 0 auto;">
+                    <div class="card-header">
+                        <h3>Configure Custom Wholesale Order</h3>
+                    </div>
+                    <form id="generate-order-form" class="dashboard-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>1. Select Approved Customer</label>
+                                <select class="form-control" id="order-customer" required>
+                                    <option value="">Select a partner...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>2. Select Product</label>
+                                <select class="form-control" id="order-product" required>
+                                    <option value="">Select a product...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Quantity (Units)</label>
+                                <input type="number" id="order-qty" class="form-control" required min="1" placeholder="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Custom Unit Price ($)</label>
+                                <input type="number" step="0.01" id="order-price" class="form-control" required placeholder="25.00">
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <div class="form-group">
+                                <label>Tax (%)</label>
+                                <input type="number" step="0.1" id="order-tax" class="form-control" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Shipping Fee ($)</label>
+                                <input type="number" step="0.01" id="order-shipping" class="form-control" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Discount ($)</label>
+                                <input type="number" step="0.01" id="order-discount" class="form-control" value="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Payment Link (Stripe/PayPal/Bank Page)</label>
+                            <input type="url" id="order-payment-link" class="form-control" required placeholder="https://buy.stripe.com/...">
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Button Text</label>
+                                <input type="text" id="order-btn-text" class="form-control" value="Buy Now">
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; padding-top: 1.5rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin: 0;">
+                                    <input type="checkbox" id="order-new-tab" checked> 
+                                    <span style="font-size: 0.9rem;">Open Payment in New Tab</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Admin Notes (Internal / Payment Instructions)</label>
+                            <textarea id="order-notes" class="form-control" style="height: 80px;" placeholder="e.g. Please use the Stripe link below to complete your secure payment. Order will ship within 48 hours of verification."></textarea>
+                        </div>
+
+                        <div style="margin-top: 1rem; padding: 1.5rem; background: #f8fafc; border-radius: 8px; border: 1px dashed var(--border-color); display: none;" id="order-gen-success">
+                            <h4 style="color: #22c55e; margin-bottom: 0.5rem;"><i class="fa-solid fa-circle-check"></i> Order Link Generated!</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Copy and send this unique checkout link to your customer:</p>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="generated-link" class="form-control" readonly style="background: white;">
+                                <button type="button" onclick="B2B_ORDERS.copyLink(document.getElementById('generated-link').value)" class="btn btn-primary btn-sm">Copy</button>
+                            </div>
+                        </div>
+
+                        <div style="text-align: right; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem;">Generate Order & Checkout Page</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Orders View -->
+            <div id="orders" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Wholesale Order History</h3>
+                    </div>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-order-list">
+                            <!-- Populated by orders.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Views (Placeholders) -->
+            <div id="payment-settings" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header"><h3>Payment Configuration</h3></div>
+                    <div class="dashboard-form">
+                        <p style="color: var(--text-muted);">Manage your bank transfer details and Stripe/PayPal integration.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-settings" class="tab-content">
+                <div class="content-card">
+                    <div class="card-header"><h3>General Settings</h3></div>
+                    <div class="dashboard-form">
+                        <p style="color: var(--text-muted);">Platform configurations, logo, and notification settings.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Product Add/Edit Modal -->
+    <div id="product-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="product-modal-title">Add New Product</h2>
+                <button onclick="B2B_PRODUCTS.toggleModal(false)" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form id="product-form">
+                <div class="modal-body">
+                    <input type="hidden" id="p-id">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="p-name" class="form-control" required placeholder="e.g. Urban Essential T-Shirt">
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>SKU</label>
+                            <input type="text" id="p-sku" class="form-control" required placeholder="TC-APP-001">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="p-category" class="form-control" required>
+                                <option value="Apparel">Apparel</option>
+                                <option value="Footwear">Footwear</option>
+                                <option value="Accessories">Accessories</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Base Price ($)</label>
+                            <input type="number" step="0.01" id="p-price" class="form-control" required placeholder="29.99">
+                        </div>
+                        <div class="form-group">
+                            <label>MOQ (Units)</label>
+                            <input type="number" id="p-moq" class="form-control" required placeholder="100">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Image URL</label>
+                        <input type="url" id="p-image" class="form-control" required placeholder="https://images.unsplash.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="p-desc" class="form-control" style="height: 100px;" required placeholder="Brief product description..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="p-status" class="form-control">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="B2B_PRODUCTS.toggleModal(false)" class="btn btn-outline">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customer Profile Modal -->
+    <div id="customer-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Partner Profile</h2>
+                <button onclick="B2B_AUTH.closeProfile()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Personal Information</h4>
+                        <p><strong>Name:</strong> <span id="c-name"></span></p>
+                        <p><strong>Email:</strong> <span id="c-email"></span></p>
+                        <p><strong>Phone:</strong> <span id="c-phone"></span></p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem;">Business Information</h4>
+                        <p><strong>Company:</strong> <span id="c-business"></span></p>
+                        <p><strong>Type:</strong> <span id="c-type"></span></p>
+                        <p><strong>Country:</strong> <span id="c-country"></span></p>
+                    </div>
+                </div>
+                <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid var(--border-color);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center;">
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                        <div style="color: var(--text-muted); font-size: 0.75rem;">Status</div>
+                        <div id="c-status" class="badge"></div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                        <div style="color: var(--text-muted); font-size: 0.75rem;">Joined</div>
+                        <div id="c-date" style="font-weight: 700; color: var(--accent-navy);"></div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                        <div style="color: var(--text-muted); font-size: 0.75rem;">Orders</div>
+                        <div id="c-orders" style="font-weight: 700; color: var(--accent-navy);">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="flex-grow: 1; text-align: left;">
+                    <button onclick="B2B_AUTH.editProfile(document.getElementById('edit-c-id').value || '')" class="btn btn-outline btn-sm">Edit Details</button>
+                </div>
+                <button onclick="B2B_AUTH.closeProfile()" class="btn btn-primary">Close Profile</button>
+            </div>
+
+            <!-- Inline Edit Form (Initially Hidden) -->
+            <div id="customer-edit-form" style="display: none; padding: 2rem; border-top: 1px solid var(--border-color); background: #fcfcfc;">
+                <h3 style="margin-bottom: 1.5rem; color: var(--accent-navy);">Edit Customer Details</h3>
+                <form onsubmit="B2B_AUTH.saveCustomerEdit(event)">
+                    <input type="hidden" id="edit-c-id">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="edit-c-name" class="form-control" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Business Name</label>
+                            <input type="text" id="edit-c-business" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Business Type</label>
+                            <select id="edit-c-type" class="form-control" required>
+                                <option value="retailer">Retailer</option>
+                                <option value="wholesaler">Wholesaler</option>
+                                <option value="distributor">Distributor</option>
+                                <option value="boutique">Boutique Owner</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Work Email</label>
+                        <input type="email" id="edit-c-email" class="form-control" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="edit-c-phone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Country</label>
+                            <input type="text" id="edit-c-country" class="form-control" required>
+                        </div>
+                    </div>
+                    <div style="text-align: right; margin-top: 1rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button type="button" onclick="document.getElementById('customer-edit-form').style.display='none'" class="btn btn-outline">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Partner</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="products.js"></script>
+    <script src="orders.js"></script>
+    <script>
+        // Tab Switching Logic
+        const tabs = document.querySelectorAll('.sidebar-menu a');
+        const contents = document.querySelectorAll('.tab-content');
+        const tabTitle = document.getElementById('tab-title');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = tab.getAttribute('data-tab');
+                switchTab(target);
+            });
+        });
+
+        function switchTab(targetId) {
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${targetId}"]`).classList.add('active');
+
+            contents.forEach(c => c.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+
+            // Update Header Title
+            const titleMap = {
+                'dashboard': 'Dashboard Overview',
+                'customers': 'Partner Management',
+                'products': 'Product Inventory',
+                'generate-order': 'Create New Order',
+                'orders': 'Order History',
+                'payment-settings': 'Payment Gateways',
+                'admin-settings': 'System Settings'
+            };
+            tabTitle.textContent = titleMap[targetId];
+        }
+
+        // Dashboard Stats Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const users = JSON.parse(localStorage.getItem('tc_users')) || [];
+            const approved = users.filter(u => u.status === 'approved' && u.role !== 'admin').length;
+            const pending = users.filter(u => u.status === 'pending').length;
+
+            document.getElementById('stat-total-users').textContent = users.length - 1; // Exclude admin
+            document.getElementById('stat-approved').textContent = approved;
+            document.getElementById('stat-pending').textContent = pending;
+            document.getElementById('stat-total-orders').textContent = "12"; // Mock
+            
+            // Populate customer dropdown in Order Generator
+            const orderCustomerSelect = document.getElementById('order-customer');
+            if (orderCustomerSelect) {
+                users.filter(u => u.status === 'approved' && u.role !== 'admin').forEach(u => {
+                    const opt = document.createElement('option');
+                    opt.value = u.id;
+                    opt.textContent = `${u.businessName} (${u.fullname})`;
+                    orderCustomerSelect.appendChild(opt);
+                });
+            }
+
+            // Populate Sample Products
+            const productList = document.getElementById('admin-product-list');
+            const sampleProducts = [
+                { name: 'Urban Essential T-Shirt', cat: 'Apparel', price: '$29.99', stock: '500 units' },
+                { name: 'Velocity Pro Sneakers', cat: 'Footwear', price: '$129.99', stock: '120 units' },
+                { name: 'Classic Denim Jeans', cat: 'Apparel', price: '$59.99', stock: '300 units' }
+            ];
+            if (productList) {
+                productList.innerHTML = sampleProducts.map(p => `
+                    <tr>
+                        <td><div class="user-info-main">${p.name}</div></td>
+                        <td>${p.cat}</td>
+                        <td>${p.price}</td>
+                        <td>${p.stock}</td>
+                        <td><button class="btn btn-outline btn-sm">Edit</button></td>
+                    </tr>
+                `).join('');
+            }
+
+            // Populate Recent Orders
+            const recentOrdersList = document.getElementById('recent-orders-list');
+            const sampleOrders = [
+                { id: 'ORD-7721', user: 'Global Retail Co.', total: '$1,240.00', status: 'approved', date: 'May 12, 2026' },
+                { id: 'ORD-7722', user: 'Luxe Boutique', total: '$850.50', status: 'pending', date: 'May 13, 2026' }
+            ];
+            if (recentOrdersList) {
+                recentOrdersList.innerHTML = sampleOrders.map(o => `
+                    <tr>
+                        <td><div class="user-info-main">#${o.id}</div></td>
+                        <td>${o.user}</td>
+                        <td>${o.total}</td>
+                        <td><span class="badge badge-${o.status}">${o.status}</span></td>
+                        <td>${o.date}</td>
+                    </tr>
+                `).join('');
+            }
+        });
+    </script>
+</body>
+</html>

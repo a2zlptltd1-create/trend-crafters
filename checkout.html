@@ -132,6 +132,150 @@
 
     <!-- Scripts -->
     <script src="components.js"></script>
-    <script src="script.js"></script>
+    <script src="auth.js"></script>
+    <script src="products.js"></script>
+    <script src="orders.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+
+            if (orderId) {
+                renderGeneratedOrder(orderId);
+            } else {
+                // Original logic for empty cart check if no orderId
+                const cart = JSON.parse(localStorage.getItem('tc_cart')) || [];
+                if (cart.length === 0) {
+                    document.getElementById('checkout-main-grid').style.display = 'none';
+                    document.getElementById('empty-checkout-view').style.display = 'block';
+                }
+            }
+        });
+
+        function renderGeneratedOrder(id) {
+            const orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+            const order = orders.find(o => o.id === id);
+            
+            if (!order) {
+                alert('Order not found or link expired.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('tc_users')) || [];
+            const user = users.find(u => u.id === order.customerId);
+            
+            const products = JSON.parse(localStorage.getItem('tc_products')) || [];
+            const product = products.find(p => p.id === order.productId);
+
+            // Update Page Title
+            document.querySelector('.section-title').innerHTML = `Wholesale Order <span class="highlight">#${order.id}</span>`;
+
+            // Update Customer Summary (Premium Invoice Style)
+            const formContainer = document.querySelector('.checkout-form-container');
+            formContainer.innerHTML = `
+                <div class="glass checkout-card" style="padding: 2.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                        <h3 style="margin: 0; color: var(--accent-navy);"><i class="fa-solid fa-user-tie"></i> B2B Partner Details</h3>
+                        <span class="badge badge-approved" style="text-transform: uppercase; letter-spacing: 1px;">Verified Order</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="info-group">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">Business Identity</label>
+                            <p style="font-size: 1.1rem; font-weight: 800; color: var(--accent-navy);">${user ? user.businessName : 'Valued Partner'}</p>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">${user ? user.businessType : ''}</p>
+                        </div>
+                        <div class="info-group">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">Primary Liaison</label>
+                            <p style="font-size: 1.1rem; font-weight: 800; color: var(--accent-navy);">${user ? user.fullname : 'Partner Representative'}</p>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">${user ? user.email : ''}</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                         <div class="info-group">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">Logistics Destination</label>
+                            <p style="font-weight: 600;">${user ? user.country : 'International'}</p>
+                        </div>
+                        <div class="info-group">
+                            <label style="display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">Account Managed By</label>
+                            <p style="font-weight: 600;">Trend Crafters Global Admin</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2.5rem; background: #fdfaf0; padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--accent-gold);">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--accent-navy); font-size: 0.95rem;"><i class="fa-solid fa-comment-dots"></i> Admin Payment Instructions</h4>
+                        <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-dark);">${order.notes || 'Please verify the order details on the right and proceed with the secure payment link provided.'}</p>
+                    </div>
+                </div>
+            `;
+
+            // Update Order Summary (Sleek List)
+            const itemsList = document.getElementById('checkout-items');
+            itemsList.innerHTML = `
+                <div class="checkout-item" style="display: flex; gap: 1.5rem; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="position: relative;">
+                        <img src="${product ? product.image : ''}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        <span style="position: absolute; -top: 10px; -right: 10px; background: var(--accent-gold); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800;">${order.quantity}</span>
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <h4 style="font-size: 1rem; color: var(--accent-navy); margin-bottom: 0.3rem;">${product ? product.name : 'Premium Selection'}</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">${product ? product.description.substring(0, 60) + '...' : ''}</p>
+                        <div style="margin-top: 0.5rem; font-size: 0.85rem;">
+                            <span style="color: var(--text-muted);">Price Per Unit:</span> 
+                            <span style="font-weight: 700; color: var(--accent-navy); margin-left: 0.5rem;">$${parseFloat(order.unitPrice).toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Update Totals with proper B2B Breakdown
+            const totalsGrid = document.querySelector('.summary-totals');
+            totalsGrid.style.background = 'white';
+            totalsGrid.style.padding = '1.5rem';
+            totalsGrid.style.borderRadius = '12px';
+            totalsGrid.style.marginTop = '1.5rem';
+
+            totalsGrid.innerHTML = `
+                <div class="summary-row" style="margin-bottom: 0.8rem;">
+                    <span style="color: var(--text-muted);">Bulk Subtotal</span>
+                    <span style="font-weight: 600;">$${parseFloat(order.subtotal).toFixed(2)}</span>
+                </div>
+                ${order.tax > 0 ? `
+                <div class="summary-row" style="margin-bottom: 0.8rem;">
+                    <span style="color: var(--text-muted);">Wholesale Tax (${order.tax}%)</span>
+                    <span style="font-weight: 600;">$${parseFloat(order.taxAmount).toFixed(2)}</span>
+                </div>` : ''}
+                ${order.shipping > 0 ? `
+                <div class="summary-row" style="margin-bottom: 0.8rem;">
+                    <span style="color: var(--text-muted);">Global Logistics</span>
+                    <span style="font-weight: 600;">$${parseFloat(order.shipping).toFixed(2)}</span>
+                </div>` : `
+                <div class="summary-row" style="margin-bottom: 0.8rem;">
+                    <span style="color: var(--text-muted);">Shipping</span>
+                    <span style="color: #22c55e; font-weight: 700;">Complimentary</span>
+                </div>`}
+                ${order.discount > 0 ? `
+                <div class="summary-row" style="margin-bottom: 0.8rem; color: #ef4444;">
+                    <span>B2B Volume Discount</span>
+                    <span style="font-weight: 700;">-$${parseFloat(order.discount).toFixed(2)}</span>
+                </div>` : ''}
+                <div class="summary-row total" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--border-color);">
+                    <span style="font-size: 1.2rem; font-weight: 800; color: var(--accent-navy);">Final Amount</span>
+                    <span style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold);">$${parseFloat(order.total).toFixed(2)}</span>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <a href="${order.paymentLink}" ${order.openInNewTab ? 'target="_blank"' : ''} class="btn btn-primary" style="width: 100%; font-size: 1.2rem; padding: 1.5rem; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2); text-transform: uppercase; letter-spacing: 1px; display: block; text-align: center; border-radius: 8px;">
+                        ${order.buttonText} <i class="fa-solid fa-arrow-right" style="margin-left: 0.8rem;"></i>
+                    </a>
+                    <p style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+                        <i class="fa-solid fa-shield-halved"></i> Secure Enterprise-Grade Payment Gateway
+                    </p>
+                </div>
+            `;
+        }
+    </script>
 </body>
 </html>

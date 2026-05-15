@@ -102,13 +102,13 @@ const B2B_AUTH = {
         const loginForm = document.getElementById('login-form');
 
         if (signupForm) {
-            signupForm.addEventListener('submit', (e) => {
+            signupForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const pass = document.getElementById('password').value;
                 const confirm = document.getElementById('confirm-password').value;
 
                 if (pass !== confirm) {
-                    alert('Passwords do not match!');
+                    this.showStatus('Passwords do not match!', 'error');
                     return;
                 }
 
@@ -124,10 +124,12 @@ const B2B_AUTH = {
 
                 const result = await this.signup(data);
                 if (result.success) {
-                    alert(result.message);
-                    window.location.href = 'login.html?status=pending';
+                    showToast(result.message);
+                    setTimeout(() => {
+                        window.location.href = 'login.html?status=pending';
+                    }, 2000);
                 } else {
-                    alert(result.message);
+                    this.showStatus(result.message, 'error');
                 }
             });
         }
@@ -303,7 +305,7 @@ const B2B_AUTH = {
             this.saveUsers();
             this.renderAdminUsers();
             this.closeProfile();
-            alert('Customer details updated successfully!');
+            showToast('Customer details updated successfully!');
         }
     },
 
@@ -320,7 +322,7 @@ const B2B_AUTH = {
                 if (newStatus === 'rejected') B2B_NOTIFY.onRejection(user);
             }
             
-            alert(`User ${user.fullname} is now ${newStatus}`);
+            showToast(`User ${user.fullname} is now ${newStatus}`);
         }
     }
 };

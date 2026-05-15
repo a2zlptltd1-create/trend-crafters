@@ -93,7 +93,7 @@ const SHARED_COMPONENTS = {
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Trend Crafters. All rights reserved.</p>
+                <p>&copy; ${new Date().getFullYear()} Trend Crafters. All rights reserved.</p>
             </div>
         </footer>
 

@@ -85,19 +85,25 @@ function closeCart() {
     document.querySelectorAll('.cart-sidebar, .cart-overlay').forEach(el => el.classList.remove('active'));
 }
 
-window.addToCart = function(id, name, price, image) {
+window.addToCart = function(id, name, price, image, moq = 1) {
     const priceNum = typeof price === 'string' ? parseFloat(price.replace('$', '')) : price;
     const existingItem = cart.find(item => item.id === id);
     
-    if (existingItem) {
+    // Check MOQ if not already in cart
+    if (!existingItem && moq > 1) {
+        // Option A: Just set quantity to MOQ
+        cart.push({ id, name, price: priceNum, image, quantity: parseInt(moq) });
+        showToast(`${name} added to cart! (Minimum Order Quantity: ${moq})`);
+    } else if (existingItem) {
         existingItem.quantity += 1;
+        showToast(`${name} quantity updated!`);
     } else {
         cart.push({ id, name, price: priceNum, image, quantity: 1 });
+        showToast(`${name} added to cart!`);
     }
     
     updateCartUI();
     openCart();
-    showToast(`${name} added to cart!`);
 };
 
 window.removeFromCart = function(id) {
@@ -296,7 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const name = card.querySelector('h3').textContent;
                 const price = card.querySelector('.price').textContent;
                 const image = card.querySelector('img').src;
-                window.addToCart(id, name, price, image);
+                const moq = card.getAttribute('data-moq') || 1;
+                window.addToCart(id, name, price, image, moq);
             }
         }
     });

@@ -6,10 +6,12 @@
 :root {
     --bg-primary: #f8fafc;
     --bg-secondary: #ffffff;
+    --white: #ffffff;          /* Standard White */
     --accent-navy: #0f172a;    /* Deep Enterprise Navy */
     --accent-gold: #c5a059;    /* Refined Metallic Gold */
     --accent-gold-light: #d4bc8d;
     --accent-yellow: #c5a059;  /* Alias for legacy gold references */
+    --accent-sage: #86a397;    /* Sophisticated Theme Sage Green */
     --text-white: #ffffff;
     --text-dark: #1e293b;      /* Slate 800 */
     --text-muted: #64748b;     /* Slate 500 */

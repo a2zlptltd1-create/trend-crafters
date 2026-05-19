@@ -217,8 +217,6 @@
 
                         <div class="form-grid">
                             <div class="form-group">
-                        <div class="form-grid">
-                            <div class="form-group">
                                 <label>Button Text</label>
                                 <input type="text" id="order-btn-text" class="form-control" value="Buy Now">
                             </div>
@@ -499,7 +497,8 @@
             document.getElementById('stat-total-users').textContent = users.length - 1; // Exclude admin
             document.getElementById('stat-approved').textContent = approved;
             document.getElementById('stat-pending').textContent = pending;
-            document.getElementById('stat-total-orders').textContent = "12"; // Mock
+            const orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+            document.getElementById('stat-total-orders').textContent = orders.length;
             
             // Populate customer dropdown in Order Generator
             const orderCustomerSelect = document.getElementById('order-customer');
@@ -512,24 +511,7 @@
                 });
             }
 
-            // Populate Sample Products
-            const productList = document.getElementById('admin-product-list');
-            const sampleProducts = [
-                { name: 'Urban Essential T-Shirt', cat: 'Apparel', price: '$29.99', stock: '500 units' },
-                { name: 'Velocity Pro Sneakers', cat: 'Footwear', price: '$129.99', stock: '120 units' },
-                { name: 'Classic Denim Jeans', cat: 'Apparel', price: '$59.99', stock: '300 units' }
-            ];
-            if (productList) {
-                productList.innerHTML = sampleProducts.map(p => `
-                    <tr>
-                        <td><div class="user-info-main">${p.name}</div></td>
-                        <td>${p.cat}</td>
-                        <td>${p.price}</td>
-                        <td>${p.stock}</td>
-                        <td><button class="btn btn-outline btn-sm">Edit</button></td>
-                    </tr>
-                `).join('');
-            }
+            // Sample Products population removed to prevent overwriting dynamic product renderer.
 
             // Populate Recent Orders
             const recentOrdersList = document.getElementById('recent-orders-list');

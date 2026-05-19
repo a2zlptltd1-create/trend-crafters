@@ -144,7 +144,7 @@
                 renderGeneratedOrder(orderId);
             } else {
                 // Original logic for empty cart check if no orderId
-                const cart = JSON.parse(localStorage.getItem('tc_cart')) || [];
+                const cart = JSON.parse(localStorage.getItem('trendCraftersCart')) || [];
                 if (cart.length === 0) {
                     document.getElementById('checkout-main-grid').style.display = 'none';
                     document.getElementById('empty-checkout-view').style.display = 'block';

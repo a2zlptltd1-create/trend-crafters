@@ -181,8 +181,14 @@
 
             // Stats
             document.getElementById('stat-active-orders').textContent = myOrders.length;
-            document.getElementById('stat-pending-payment').textContent = myOrders.filter(o => o.status === 'pending').length;
-            document.getElementById('stat-completed-orders').textContent = myOrders.filter(o => o.status === 'paid').length;
+            document.getElementById('stat-pending-payment').textContent = myOrders.filter(o => {
+                const s = o.status ? o.status.toLowerCase() : '';
+                return s === 'pending' || s === 'pending payment' || s === 'generated';
+            }).length;
+            document.getElementById('stat-completed-orders').textContent = myOrders.filter(o => {
+                const s = o.status ? o.status.toLowerCase() : '';
+                return s === 'paid' || s === 'completed';
+            }).length;
 
             if (myOrders.length === 0) {
                 const emptyRow = '<tr><td colspan="7" style="text-align:center; padding:3rem; color:var(--text-muted);">No orders generated for your account yet.</td></tr>';
@@ -191,6 +197,14 @@
                 return;
             }
 
+            const getStatusClass = (status) => {
+                if (!status) return 'pending';
+                const s = status.toLowerCase();
+                if (s === 'paid' || s === 'completed' || s === 'approved') return 'approved';
+                if (s === 'cancelled' || s === 'rejected') return 'rejected';
+                return 'pending'; // 'pending payment', 'generated', 'draft'
+            };
+
             const getHtml = (o) => {
                 const p = products.find(prod => prod.id === o.productId);
                 return `
@@ -198,7 +212,7 @@
                         <td><div class="user-info-main">#${o.id}</div></td>
                         <td>${p ? p.name : 'Custom Package'}</td>
                         <td>$${parseFloat(o.total).toFixed(2)}</td>
-                        <td><span class="badge badge-${o.status}">${o.status}</span></td>
+                        <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
                         <td><a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Complete Payment</a></td>
                     </tr>
                 `;
@@ -213,7 +227,7 @@
                         <td>${p ? p.name : 'Custom Item'}</td>
                         <td>${o.quantity} units</td>
                         <td style="font-weight: 700;">$${parseFloat(o.total).toFixed(2)}</td>
-                        <td><span class="badge badge-${o.status}">${o.status}</span></td>
+                        <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
                         <td><a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Pay Now</a></td>
                     </tr>
                 `;

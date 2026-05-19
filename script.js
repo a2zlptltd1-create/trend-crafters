@@ -370,6 +370,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = urlParams.get('search');
         if (q) performSearch(q);
 
+        const filterParam = urlParams.get('filter');
+        if (filterParam) {
+            // Wait for dynamic products to render first, then trigger click
+            setTimeout(() => {
+                const btn = document.querySelector(`.filter-btn[data-filter="${filterParam}"]`);
+                if (btn) btn.click();
+            }, 100);
+        }
+
         // Filter Buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {

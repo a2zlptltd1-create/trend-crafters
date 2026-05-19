@@ -214,8 +214,18 @@
             const grid = document.getElementById('main-product-grid');
             if (!grid) return;
 
-            // Clear static content
-            grid.innerHTML = '';
+            // Helper to map DB categories to Shop filter categories
+            const getFilterCategory = (cat, name) => {
+                if (!cat) return 't-shirt';
+                const c = cat.toLowerCase();
+                const n = name ? name.toLowerCase() : '';
+                if (c === 'apparel') {
+                    if (n.includes('pants') || n.includes('jeans') || n.includes('trouser')) return 'pants';
+                    return 't-shirt';
+                }
+                if (c === 'footwear') return 'sneakers';
+                return c; // accessories etc.
+            };
 
             const products = B2B_PRODUCTS.products.filter(p => p.status === 'active');
 
@@ -224,27 +234,30 @@
                 return;
             }
 
-            grid.innerHTML = products.map(p => `
-                <div class="product-card" data-id="${p.id}" data-category="${p.category.toLowerCase()}">
-                    <div class="product-img">
-                        <img src="${p.image}" alt="${p.name}">
-                        <div class="product-badge" style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-navy); color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">MOQ: ${p.moq}</div>
-                        <button class="add-to-cart" 
-                                onclick="window.addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.basePrice}, '${p.image}', ${p.moq})" 
-                                aria-label="Add ${p.name} to cart">
-                            <i class="fa-solid fa-cart-plus"></i>
-                        </button>
-                    </div>
-                    <div class="product-info">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                            <h3>${p.name}</h3>
-                            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">SKU: ${p.sku}</span>
+            grid.innerHTML = products.map(p => {
+                const uiCategory = getFilterCategory(p.category, p.name);
+                return `
+                    <div class="product-card" data-id="${p.id}" data-category="${uiCategory}">
+                        <div class="product-img">
+                            <img src="${p.image}" alt="${p.name}">
+                            <div class="product-badge" style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-navy); color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">MOQ: ${p.moq}</div>
+                            <button class="add-to-cart" 
+                                    onclick="window.addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.basePrice}, '${p.image}', ${p.moq})" 
+                                    aria-label="Add ${p.name} to cart">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
                         </div>
-                        <p class="price">$${parseFloat(p.basePrice).toFixed(2)}</p>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 1rem 0;">${p.description}</p>
+                        <div class="product-info">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                <h3>${p.name}</h3>
+                                <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">SKU: ${p.sku}</span>
+                            </div>
+                            <p class="price">$${parseFloat(p.basePrice).toFixed(2)}</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 1rem 0;">${p.description}</p>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         });
     </script>
 </body>

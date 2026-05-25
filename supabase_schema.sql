@@ -1,0 +1,151 @@
+-- Supabase Database Schema Setup for Trend Crafters
+-- Copy this entire script and run it in the SQL Editor on Supabase (https://supabase.com)
+
+-- 1. Create Profiles Table (extends auth.users)
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+    fullname TEXT NOT NULL,
+    business_name TEXT NOT NULL,
+    business_type TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    country TEXT NOT NULL,
+    role TEXT DEFAULT 'user' CHECK (role IN ('admin', 'user')),
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'deactivated')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Profiles
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- 2. Create Products Table
+CREATE TABLE IF NOT EXISTS public.products (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    sku TEXT UNIQUE NOT NULL,
+    category TEXT NOT NULL,
+    description TEXT NOT NULL,
+    image TEXT NOT NULL,
+    base_price DECIMAL(10, 2) NOT NULL,
+    moq INTEGER DEFAULT 1 NOT NULL,
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Products
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+-- 3. Create Orders Table
+CREATE TABLE IF NOT EXISTS public.orders (
+    id TEXT PRIMARY KEY, -- Custom B2B order ID (e.g. ORD-1234)
+    customer_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    product_id UUID REFERENCES public.products(id) ON DELETE SET NULL,
+    quantity INTEGER NOT NULL,
+    unit_price DECIMAL(10, 2) NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
+    tax DECIMAL(5, 2) DEFAULT 0 NOT NULL,
+    tax_amount DECIMAL(10, 2) DEFAULT 0 NOT NULL,
+    shipping DECIMAL(10, 2) DEFAULT 0 NOT NULL,
+    discount DECIMAL(10, 2) DEFAULT 0 NOT NULL,
+    total DECIMAL(10, 2) NOT NULL,
+    payment_link TEXT,
+    button_text TEXT DEFAULT 'Pay Now' NOT NULL,
+    notes TEXT,
+    status TEXT DEFAULT 'Pending' CHECK (status IN ('Draft', 'Generated', 'Sent', 'Pending', 'Paid', 'Processing', 'Completed', 'Cancelled')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Orders
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+
+-- 4. Enable RLS Policies
+
+-- Profiles Policies:
+-- Allow everyone to read profiles (needed for authentication status checks)
+CREATE POLICY "Allow public read access to profiles" ON public.profiles
+    FOR SELECT USING (true);
+
+-- Allow users to insert their own profile
+CREATE POLICY "Allow users to insert their own profile" ON public.profiles
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Allow users to update their own profile
+CREATE POLICY "Allow users to update own profile" ON public.profiles
+    FOR UPDATE USING (auth.uid() = id);
+
+-- Allow admins to do everything on profiles
+CREATE POLICY "Admins have full access to profiles" ON public.profiles
+    ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE id = auth.uid() AND role = 'admin'
+        )
+    );
+
+-- Products Policies:
+-- Allow anyone to read active products
+CREATE POLICY "Allow public read active products" ON public.products
+    FOR SELECT USING (status = 'active' OR EXISTS (
+        SELECT 1 FROM public.profiles 
+        WHERE id = auth.uid() AND role = 'admin'
+    ));
+
+-- Allow admins to do everything on products
+CREATE POLICY "Admins have full access to products" ON public.products
+    ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE id = auth.uid() AND role = 'admin'
+        )
+    );
+
+-- Orders Policies:
+-- Customers can view their own orders
+CREATE POLICY "Allow users to select their own orders" ON public.orders
+    FOR SELECT USING (customer_id = auth.uid() OR EXISTS (
+        SELECT 1 FROM public.profiles 
+        WHERE id = auth.uid() AND role = 'admin'
+    ));
+
+-- Allow admins to do everything on orders
+CREATE POLICY "Admins have full access to orders" ON public.orders
+    ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE id = auth.uid() AND role = 'admin'
+        )
+    );
+
+-- 5. Trigger to handle new user registration in auth.users
+-- This automatically inserts a new profile row when a user signs up via Supabase Auth
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, fullname, business_name, business_type, phone, country, role, status)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'fullname', 'B2B Partner'),
+    COALESCE(NEW.raw_user_meta_data->>'businessName', 'New Company'),
+    COALESCE(NEW.raw_user_meta_data->>'businessType', 'Wholesale'),
+    COALESCE(NEW.raw_user_meta_data->>'phone', ''),
+    COALESCE(NEW.raw_user_meta_data->>'country', 'US'),
+    'user',
+    'pending' -- default B2B status
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger execution
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Insert Sample Products into the products table
+INSERT INTO public.products (name, sku, category, description, image, base_price, moq, status)
+VALUES 
+('Urban Essential T-Shirt', 'TC-TSH-001', 'Apparel', 'Premium heavy-weight cotton t-shirt for urban brands.', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=1000', 29.99, 100, 'active'),
+('Velocity Pro Sneakers', 'TC-SNK-002', 'Footwear', 'High-performance sneakers with breathable mesh.', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000', 129.99, 50, 'active')
+ON CONFLICT (sku) DO NOTHING;

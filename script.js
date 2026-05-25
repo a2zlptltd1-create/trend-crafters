@@ -260,6 +260,75 @@ function renderCheckoutSummary() {
     if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
 }
 
+// --- B2B SHOP & GATE FUNCTIONS ---
+window.applyShopUrlParams = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const q = urlParams.get('search');
+    if (q) performSearch(q);
+
+    const filterParam = urlParams.get('filter');
+    if (filterParam) {
+        const btn = document.querySelector(`.filter-btn[data-filter="${filterParam}"]`);
+        if (btn) btn.click();
+    }
+};
+
+function updateHomepagePrices() {
+    const user = JSON.parse(localStorage.getItem('tc_current_user'));
+    const isApproved = user && (user.role === 'admin' || user.status === 'approved');
+    
+    const p1Card = document.querySelector('.product-card[data-id="p1"]');
+    const p2Card = document.querySelector('.product-card[data-id="p2"]');
+    const p3Card = document.querySelector('.product-card[data-id="p3"]');
+    const p4Card = document.querySelector('.product-card[data-id="p4"]');
+
+    if (isApproved) {
+        if (p1Card) {
+            const priceEl = p1Card.querySelector('.price');
+            if (priceEl) {
+                priceEl.textContent = '$29.99';
+                priceEl.style.fontSize = '';
+                priceEl.style.color = '';
+            }
+            const imgContainer = p1Card.querySelector('.product-img');
+            if (imgContainer && !imgContainer.querySelector('.add-to-cart')) {
+                imgContainer.style.position = 'relative';
+                const btn = document.createElement('button');
+                btn.className = 'add-to-cart';
+                btn.setAttribute('aria-label', 'Add Urban Essential T-Shirt to cart');
+                btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i>';
+                imgContainer.appendChild(btn);
+            }
+            const btn = p1Card.querySelector('.btn');
+            if (btn) btn.remove();
+        }
+    } else {
+        const cardsToLock = [p2Card, p3Card, p4Card];
+        cardsToLock.forEach(card => {
+            if (card) {
+                const cartBtn = card.querySelector('.add-to-cart');
+                if (cartBtn) cartBtn.remove();
+                
+                const priceEl = card.querySelector('.price');
+                if (priceEl) {
+                    priceEl.textContent = 'Login for Wholesale Price';
+                    priceEl.style.fontSize = '0.9rem';
+                    priceEl.style.color = 'var(--text-muted)';
+                }
+                const infoContainer = card.querySelector('.product-info');
+                if (infoContainer && !infoContainer.querySelector('.btn')) {
+                    const btn = document.createElement('a');
+                    btn.href = 'login.html';
+                    btn.className = 'btn btn-outline btn-sm';
+                    btn.style.cssText = 'width: 100%; margin-top: 1rem;';
+                    btn.textContent = 'View Details';
+                    infoContainer.appendChild(btn);
+                }
+            }
+        });
+    }
+}
+
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     updateCartUI();
@@ -361,24 +430,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchBtn) searchBtn.addEventListener('click', () => performSearch(searchInput.value));
     if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(searchInput.value); });
 
+    // Homepage B2B Gate check
+    const isHomePage = window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/') || window.location.pathname === '';
+    if (isHomePage) {
+        updateHomepagePrices();
+    }
+
     // Shop Page Specifics
     const isShopPage = window.location.pathname.includes('shop.html');
     const isCheckoutPage = window.location.pathname.includes('checkout.html');
 
     if (isShopPage) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const q = urlParams.get('search');
-        if (q) performSearch(q);
-
-        const filterParam = urlParams.get('filter');
-        if (filterParam) {
-            // Wait for dynamic products to render first, then trigger click
-            setTimeout(() => {
-                const btn = document.querySelector(`.filter-btn[data-filter="${filterParam}"]`);
-                if (btn) btn.click();
-            }, 100);
-        }
-
         // Filter Buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {

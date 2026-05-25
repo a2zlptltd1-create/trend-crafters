@@ -23,6 +23,11 @@
                 <p>Apply for a business account to access our wholesale portal.</p>
             </div>
 
+            <!-- Status Messages (Hidden by default) -->
+            <div id="auth-message" style="display: none; margin-bottom: 1.5rem; padding: 1rem; border-radius: 4px; font-size: 0.9rem;">
+                <p></p>
+            </div>
+
             <form id="signup-form">
                 <div class="form-group">
                     <label for="fullname">Full Name</label>
@@ -88,6 +93,9 @@
     <!-- Shared Footer Placeholder -->
     <div id="footer-placeholder"></div>
 
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script src="notifications.js"></script>
     <script src="components.js"></script>
     <script src="auth.js"></script>

@@ -177,15 +177,18 @@ const B2B_AUTH = {
         const path = window.location.pathname.split('/').pop();
         
         const adminPages = ['admin.html'];
-        const portalPages = ['portal.html', 'shop.html'];
+        const portalPages = ['portal.html', 'shop.html', 'checkout.html'];
 
         if (adminPages.includes(path)) {
             if (!user || user.role !== 'admin') window.location.href = 'login.html';
         }
 
         if (portalPages.includes(path)) {
-            if (!user || (user.role !== 'admin' && user.status !== 'approved')) {
-                window.location.href = 'login.html';
+            const isCustomCheckout = path.includes('checkout.html') && window.location.search.includes('orderId=');
+            if (!isCustomCheckout) {
+                if (!user || (user.role !== 'admin' && user.status !== 'approved')) {
+                    window.location.href = 'login.html';
+                }
             }
         }
     },
@@ -304,6 +307,9 @@ const B2B_AUTH = {
             };
             this.saveUsers();
             this.renderAdminUsers();
+            if (typeof window.updateDashboardStats === 'function') {
+                window.updateDashboardStats();
+            }
             this.closeProfile();
             showToast('Customer details updated successfully!');
         }
@@ -315,6 +321,9 @@ const B2B_AUTH = {
             user.status = newStatus;
             this.saveUsers();
             this.renderAdminUsers();
+            if (typeof window.updateDashboardStats === 'function') {
+                window.updateDashboardStats();
+            }
 
             // Notify User
             if (typeof B2B_NOTIFY !== 'undefined') {

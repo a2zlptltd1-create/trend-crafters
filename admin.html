@@ -451,6 +451,10 @@
         </div>
     </div>
 
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script src="notifications.js"></script>
     <script src="auth.js"></script>
     <script src="products.js"></script>
     <script src="orders.js"></script>
@@ -489,29 +493,40 @@
         }
 
         // Dashboard Stats Logic
-        document.addEventListener('DOMContentLoaded', () => {
+        window.updateDashboardStats = function() {
             const users = JSON.parse(localStorage.getItem('tc_users')) || [];
             const approved = users.filter(u => u.status === 'approved' && u.role !== 'admin').length;
             const pending = users.filter(u => u.status === 'pending').length;
 
-            document.getElementById('stat-total-users').textContent = users.length - 1; // Exclude admin
-            document.getElementById('stat-approved').textContent = approved;
-            document.getElementById('stat-pending').textContent = pending;
-            const orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
-            document.getElementById('stat-total-orders').textContent = orders.length;
+            const totalUsersEl = document.getElementById('stat-total-users');
+            const approvedEl = document.getElementById('stat-approved');
+            const pendingEl = document.getElementById('stat-pending');
+            const totalOrdersEl = document.getElementById('stat-total-orders');
+
+            if (totalUsersEl) totalUsersEl.textContent = users.length - 1; // Exclude admin
+            if (approvedEl) approvedEl.textContent = approved;
+            if (pendingEl) pendingEl.textContent = pending;
             
+            const orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+            if (totalOrdersEl) totalOrdersEl.textContent = orders.length;
+
             // Populate customer dropdown in Order Generator
             const orderCustomerSelect = document.getElementById('order-customer');
             if (orderCustomerSelect) {
+                const selectedVal = orderCustomerSelect.value;
+                orderCustomerSelect.innerHTML = '<option value="">Select a partner...</option>';
                 users.filter(u => u.status === 'approved' && u.role !== 'admin').forEach(u => {
                     const opt = document.createElement('option');
                     opt.value = u.id;
                     opt.textContent = `${u.businessName} (${u.fullname})`;
+                    if (u.id === selectedVal) opt.selected = true;
                     orderCustomerSelect.appendChild(opt);
                 });
             }
+        };
 
-            // Sample Products population removed to prevent overwriting dynamic product renderer.
+        document.addEventListener('DOMContentLoaded', () => {
+            window.updateDashboardStats();
 
             // Populate Recent Orders
             const recentOrdersList = document.getElementById('recent-orders-list');

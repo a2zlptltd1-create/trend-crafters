@@ -205,6 +205,9 @@
     <div id="footer-placeholder"></div>
 
     <!-- Scripts -->
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script src="components.js"></script>
     <script src="auth.js"></script>
     <script src="script.js"></script>
@@ -237,13 +240,11 @@
             grid.innerHTML = products.map(p => {
                 const uiCategory = getFilterCategory(p.category, p.name);
                 return `
-                    <div class="product-card" data-id="${p.id}" data-category="${uiCategory}">
+                    <div class="product-card" data-id="${p.id}" data-category="${uiCategory}" data-moq="${p.moq}">
                         <div class="product-img">
                             <img src="${p.image}" alt="${p.name}">
                             <div class="product-badge" style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-navy); color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">MOQ: ${p.moq}</div>
-                            <button class="add-to-cart" 
-                                    onclick="window.addToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.basePrice}, '${p.image}', ${p.moq})" 
-                                    aria-label="Add ${p.name} to cart">
+                            <button class="add-to-cart" aria-label="Add ${p.name} to cart">
                                 <i class="fa-solid fa-cart-plus"></i>
                             </button>
                         </div>
@@ -258,6 +259,11 @@
                     </div>
                 `;
             }).join('');
+
+            // Apply URL search & filter params after rendering
+            if (window.applyShopUrlParams) {
+                window.applyShopUrlParams();
+            }
         });
     </script>
 </body>

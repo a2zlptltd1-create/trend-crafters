@@ -38,6 +38,9 @@ const B2B_ORDERS = {
         this.orders.push(newOrder);
         this.save();
         this.renderAdminOrders();
+        if (typeof window.updateDashboardStats === 'function') {
+            window.updateDashboardStats();
+        }
 
         // Notify Customer
         if (typeof B2B_NOTIFY !== 'undefined') {
@@ -67,6 +70,9 @@ const B2B_ORDERS = {
             order.status = newStatus;
             this.save();
             this.renderAdminOrders();
+            if (typeof window.updateDashboardStats === 'function') {
+                window.updateDashboardStats();
+            }
             
             // If on portal, re-render might be needed, but usually admin does this
             const portalList = document.getElementById('portal-full-order-list');
@@ -79,6 +85,9 @@ const B2B_ORDERS = {
             this.orders = this.orders.filter(o => o.id !== orderId);
             this.save();
             this.renderAdminOrders();
+            if (typeof window.updateDashboardStats === 'function') {
+                window.updateDashboardStats();
+            }
         }
     },
 

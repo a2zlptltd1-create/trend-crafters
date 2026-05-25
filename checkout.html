@@ -131,6 +131,9 @@
     <div id="footer-placeholder"></div>
 
     <!-- Scripts -->
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
     <script src="components.js"></script>
     <script src="auth.js"></script>
     <script src="products.js"></script>
@@ -217,7 +220,7 @@
                 <div class="checkout-item" style="display: flex; gap: 1.5rem; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid var(--border-color);">
                     <div style="position: relative;">
                         <img src="${product ? product.image : ''}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                        <span style="position: absolute; -top: 10px; -right: 10px; background: var(--accent-gold); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800;">${order.quantity}</span>
+                        <span style="position: absolute; top: -10px; right: -10px; background: var(--accent-gold); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800;">${order.quantity}</span>
                     </div>
                     <div style="flex-grow: 1;">
                         <h4 style="font-size: 1rem; color: var(--accent-navy); margin-bottom: 0.3rem;">${product ? product.name : 'Premium Selection'}</h4>

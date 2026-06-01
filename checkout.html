@@ -34,7 +34,7 @@
                     <div class="glass checkout-card">
                         <h3><i class="fa-solid fa-truck"></i> Shipping Information</h3>
                         <form action="https://api.web3forms.com/submit" method="POST" id="checkout-form">
-                            <input type="hidden" name="access_key" value="51ffeffb-889e-4934-a4a5-17a90dbfa209">
+                            <input type="hidden" name="access_key" value="dfb25c43-18c6-463b-8908-527f540aad79">
                             <input type="hidden" name="subject" value="New Wholesale Order - Trend Crafters">
                             <input type="hidden" name="order_details" id="order-details-hidden">
                             <div class="form-row">
@@ -139,12 +139,12 @@
     <script src="products.js"></script>
     <script src="orders.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('orderId');
 
             if (orderId) {
-                renderGeneratedOrder(orderId);
+                await renderGeneratedOrder(orderId);
             } else {
                 // Original logic for empty cart check if no orderId
                 const cart = JSON.parse(localStorage.getItem('trendCraftersCart')) || [];
@@ -155,21 +155,94 @@
             }
         });
 
-        function renderGeneratedOrder(id) {
-            const orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
-            const order = orders.find(o => o.id === id);
-            
+        async function renderGeneratedOrder(id) {
+            let order = null;
+            let user = null;
+            let product = null;
+
+            if (window.supabaseClient) {
+                try {
+                    const { data: ord, error: ordErr } = await window.supabaseClient
+                        .from('orders')
+                        .select('*')
+                        .eq('id', id)
+                        .single();
+
+                    if (ordErr || !ord) {
+                        alert('Order not found or link expired.');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+
+                    order = {
+                        id: ord.id,
+                        customerId: ord.customer_id,
+                        productId: ord.product_id,
+                        quantity: ord.quantity,
+                        unitPrice: parseFloat(ord.unit_price),
+                        subtotal: parseFloat(ord.subtotal),
+                        tax: parseFloat(ord.tax),
+                        taxAmount: parseFloat(ord.tax_amount),
+                        shipping: parseFloat(ord.shipping),
+                        discount: parseFloat(ord.discount),
+                        total: parseFloat(ord.total),
+                        paymentLink: ord.payment_link,
+                        buttonText: ord.button_text,
+                        notes: ord.notes,
+                        status: ord.status
+                    };
+
+                    // Fetch customer profile details
+                    const { data: profile } = await window.supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', order.customerId)
+                        .single();
+                    
+                    if (profile) {
+                        user = {
+                            fullname: profile.fullname,
+                            email: profile.email,
+                            businessName: profile.business_name,
+                            businessType: profile.business_type,
+                            country: profile.country
+                        };
+                    }
+
+                    // Fetch product details
+                    const { data: prod } = await window.supabaseClient
+                        .from('products')
+                        .select('*')
+                        .eq('id', order.productId)
+                        .single();
+
+                    if (prod) {
+                        product = {
+                            name: prod.name,
+                            description: prod.description,
+                            image: prod.image
+                        };
+                    }
+                } catch (err) {
+                    console.error("Error reading order from DB:", err);
+                }
+            } else {
+                const orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+                const localOrder = orders.find(o => o.id === id);
+                if (localOrder) {
+                    order = localOrder;
+                    const users = JSON.parse(localStorage.getItem('tc_users')) || [];
+                    user = users.find(u => u.id === order.customerId);
+                    const products = JSON.parse(localStorage.getItem('tc_products')) || [];
+                    product = products.find(p => p.id === order.productId);
+                }
+            }
+
             if (!order) {
                 alert('Order not found or link expired.');
                 window.location.href = 'index.html';
                 return;
             }
-
-            const users = JSON.parse(localStorage.getItem('tc_users')) || [];
-            const user = users.find(u => u.id === order.customerId);
-            
-            const products = JSON.parse(localStorage.getItem('tc_products')) || [];
-            const product = products.find(p => p.id === order.productId);
 
             // Update Page Title
             document.querySelector('.section-title').innerHTML = `Wholesale Order <span class="highlight">#${order.id}</span>`;

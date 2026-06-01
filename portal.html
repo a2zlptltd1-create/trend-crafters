@@ -174,13 +174,63 @@
             renderPortalOrders(user.id);
         });
 
-        function renderPortalOrders(userId) {
-            const allOrders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
-            const myOrders = allOrders.filter(o => o.customerId === userId);
-            
+        async function renderPortalOrders(userId) {
+            let myOrders = [];
+            let products = [];
+
             const recentList = document.getElementById('portal-recent-orders');
             const fullList = document.getElementById('portal-full-order-list');
-            const products = JSON.parse(localStorage.getItem('tc_products')) || [];
+
+            if (window.supabaseClient) {
+                try {
+                    const { data: ords } = await window.supabaseClient
+                        .from('orders')
+                        .select('*')
+                        .eq('customer_id', userId);
+                    
+                    const { data: prods } = await window.supabaseClient
+                        .from('products')
+                        .select('*');
+                    
+                    myOrders = (ords || []).map(o => ({
+                        id: o.id,
+                        customerId: o.customer_id,
+                        productId: o.product_id,
+                        quantity: o.quantity,
+                        unitPrice: parseFloat(o.unit_price),
+                        subtotal: parseFloat(o.subtotal),
+                        tax: parseFloat(o.tax),
+                        taxAmount: parseFloat(o.tax_amount),
+                        shipping: parseFloat(o.shipping),
+                        discount: parseFloat(o.discount),
+                        total: parseFloat(o.total),
+                        paymentLink: o.payment_link,
+                        buttonText: o.button_text,
+                        notes: o.notes,
+                        status: o.status,
+                        createdAt: o.created_at,
+                        checkoutUrl: `checkout.html?orderId=${o.id}`
+                    }));
+
+                    products = (prods || []).map(p => ({
+                        id: p.id,
+                        name: p.name,
+                        sku: p.sku,
+                        category: p.category,
+                        description: p.description,
+                        basePrice: parseFloat(p.base_price),
+                        moq: p.moq,
+                        image: p.image,
+                        status: p.status
+                    }));
+                } catch (err) {
+                    console.error("Error reading portal data from Supabase:", err);
+                }
+            } else {
+                const allOrders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+                myOrders = allOrders.filter(o => o.customerId === userId);
+                products = JSON.parse(localStorage.getItem('tc_products')) || [];
+            }
 
             // Stats
             document.getElementById('stat-active-orders').textContent = myOrders.length;
@@ -210,19 +260,33 @@
 
             const getHtml = (o) => {
                 const p = products.find(prod => prod.id === o.productId);
+                const s = o.status ? o.status.toLowerCase() : '';
+                const canPay = s !== 'paid' && s !== 'completed' && s !== 'cancelled';
+                
+                const actionCell = canPay 
+                    ? `<a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Complete Payment</a>`
+                    : `<span style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-lock" style="margin-right: 0.3rem;"></i> Locked</span>`;
+
                 return `
                     <tr>
                         <td><div class="user-info-main">#${o.id}</div></td>
                         <td>${p ? p.name : 'Custom Package'}</td>
                         <td>$${parseFloat(o.total).toFixed(2)}</td>
                         <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
-                        <td><a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Complete Payment</a></td>
+                        <td>${actionCell}</td>
                     </tr>
                 `;
             };
 
             const getFullHtml = (o) => {
                 const p = products.find(prod => prod.id === o.productId);
+                const s = o.status ? o.status.toLowerCase() : '';
+                const canPay = s !== 'paid' && s !== 'completed' && s !== 'cancelled';
+
+                const actionCell = canPay 
+                    ? `<a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Pay Now</a>`
+                    : `<span style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-circle-check" style="color: #22c55e; margin-right: 0.3rem;"></i> Closed</span>`;
+
                 return `
                     <tr>
                         <td>${new Date(o.createdAt).toLocaleDateString()}</td>
@@ -231,7 +295,7 @@
                         <td>${o.quantity} units</td>
                         <td style="font-weight: 700;">$${parseFloat(o.total).toFixed(2)}</td>
                         <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
-                        <td><a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Pay Now</a></td>
+                        <td>${actionCell}</td>
                     </tr>
                 `;
             };

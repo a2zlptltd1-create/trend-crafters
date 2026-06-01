@@ -66,5 +66,19 @@
     <script src="supabase-client.js"></script>
     <script src="components.js"></script>
     <script src="auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            const status = urlParams.get('status');
+
+            if (redirect) {
+                const pageName = redirect.includes('shop.html') ? 'Product Catalog' : 'Partner Portal';
+                B2B_AUTH.showStatus(`Please login or register to view the wholesale ${pageName}.`, 'warning');
+            } else if (status === 'pending') {
+                B2B_AUTH.showStatus("Application submitted successfully! Your account is pending admin approval.", 'warning');
+            }
+        });
+    </script>
 </body>
 </html>

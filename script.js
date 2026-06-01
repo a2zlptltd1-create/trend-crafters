@@ -396,7 +396,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 orderDetailsInput.value = details;
             }
 
-            handleFormSubmit(form, () => {
+            const syncCartToSupabase = async () => {
+                const user = JSON.parse(localStorage.getItem('tc_current_user'));
+                if (window.supabaseClient && user) {
+                    try {
+                        const products = (typeof B2B_PRODUCTS !== 'undefined' ? B2B_PRODUCTS.products : []) || [];
+                        for (const item of cart) {
+                            // Match default item IDs or names to get UUID
+                            const matchedProd = products.find(p => p.id === item.id || p.name === item.name || p.sku === item.id);
+                            const prodId = matchedProd ? matchedProd.id : null;
+
+                            const orderId = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                            const subtotal = item.quantity * item.price;
+
+                            const dbOrder = {
+                                id: orderId,
+                                customer_id: user.id,
+                                product_id: prodId,
+                                quantity: item.quantity,
+                                unit_price: item.price,
+                                subtotal: subtotal,
+                                total: subtotal,
+                                status: 'Pending',
+                                button_text: 'Pay Now'
+                            };
+
+                            await window.supabaseClient.from('orders').insert([dbOrder]);
+                        }
+                    } catch (dbErr) {
+                        console.error("Failed to sync checkout cart items to Supabase:", dbErr);
+                    }
+                }
+            };
+
+            handleFormSubmit(form, async () => {
+                await syncCartToSupabase();
                 const modal = document.getElementById('success-modal');
                 if (modal) modal.classList.add('active');
                 cart = [];

@@ -84,7 +84,7 @@ const SHARED_COMPONENTS = {
                     <h4>Stay Updated</h4>
                     <p>Join our newsletter for exclusive offers.</p>
                     <form action="https://api.web3forms.com/submit" method="POST" class="newsletter-form">
-                        <input type="hidden" name="access_key" value="51ffeffb-889e-4934-a4a5-17a90dbfa209">
+                        <input type="hidden" name="access_key" value="dfb25c43-18c6-463b-8908-527f540aad79">
                         <input type="hidden" name="subject" value="New Newsletter Subscriber">
                         <input type="email" name="email" placeholder="Email Address" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$" title="Please enter a valid email address">
                         <button type="submit" class="btn btn-primary">Join</button>

@@ -5,6 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
     fullname TEXT NOT NULL,
+    email TEXT,
     business_name TEXT NOT NULL,
     business_type TEXT NOT NULL,
     phone TEXT NOT NULL,
@@ -123,10 +124,11 @@ CREATE POLICY "Admins have full access to orders" ON public.orders
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, fullname, business_name, business_type, phone, country, role, status)
+  INSERT INTO public.profiles (id, fullname, email, business_name, business_type, phone, country, role, status)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'fullname', 'B2B Partner'),
+    NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'businessName', 'New Company'),
     COALESCE(NEW.raw_user_meta_data->>'businessType', 'Wholesale'),
     COALESCE(NEW.raw_user_meta_data->>'phone', ''),

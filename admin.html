@@ -493,8 +493,24 @@
         }
 
         // Dashboard Stats Logic
-        window.updateDashboardStats = function() {
-            const users = JSON.parse(localStorage.getItem('tc_users')) || [];
+        window.updateDashboardStats = async function() {
+            let users = [];
+            let orders = [];
+
+            if (window.supabaseClient) {
+                try {
+                    const { data: u } = await window.supabaseClient.from('profiles').select('*');
+                    const { data: o } = await window.supabaseClient.from('orders').select('*');
+                    users = u || [];
+                    orders = o || [];
+                } catch (err) {
+                    console.error("Error updating stats from database:", err);
+                }
+            } else {
+                users = JSON.parse(localStorage.getItem('tc_users')) || [];
+                orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+            }
+
             const approved = users.filter(u => u.status === 'approved' && u.role !== 'admin').length;
             const pending = users.filter(u => u.status === 'pending').length;
 
@@ -503,11 +519,9 @@
             const pendingEl = document.getElementById('stat-pending');
             const totalOrdersEl = document.getElementById('stat-total-orders');
 
-            if (totalUsersEl) totalUsersEl.textContent = users.length - 1; // Exclude admin
+            if (totalUsersEl) totalUsersEl.textContent = users.filter(u => u.role !== 'admin').length;
             if (approvedEl) approvedEl.textContent = approved;
             if (pendingEl) pendingEl.textContent = pending;
-            
-            const orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
             if (totalOrdersEl) totalOrdersEl.textContent = orders.length;
 
             // Populate customer dropdown in Order Generator
@@ -518,33 +532,67 @@
                 users.filter(u => u.status === 'approved' && u.role !== 'admin').forEach(u => {
                     const opt = document.createElement('option');
                     opt.value = u.id;
-                    opt.textContent = `${u.businessName} (${u.fullname})`;
+                    opt.textContent = `${u.business_name || u.businessName} (${u.fullname})`;
                     if (u.id === selectedVal) opt.selected = true;
                     orderCustomerSelect.appendChild(opt);
                 });
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
-            window.updateDashboardStats();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await window.updateDashboardStats();
 
-            // Populate Recent Orders
+            // Populate Recent Orders from Live Database
             const recentOrdersList = document.getElementById('recent-orders-list');
-            const sampleOrders = [
-                { id: 'ORD-7721', user: 'Global Retail Co.', total: '$1,240.00', status: 'approved', date: 'May 12, 2026' },
-                { id: 'ORD-7722', user: 'Luxe Boutique', total: '$850.50', status: 'pending', date: 'May 13, 2026' }
-            ];
-            if (recentOrdersList) {
-                recentOrdersList.innerHTML = sampleOrders.map(o => `
+            if (!recentOrdersList) return;
+
+            let users = [];
+            let orders = [];
+
+            if (window.supabaseClient) {
+                try {
+                    const { data: u } = await window.supabaseClient.from('profiles').select('*');
+                    const { data: o } = await window.supabaseClient.from('orders').select('*').order('created_at', { ascending: false }).limit(5);
+                    users = u || [];
+                    orders = o || [];
+                } catch (err) {
+                    console.error("Error loading recent orders from DB:", err);
+                }
+            } else {
+                users = JSON.parse(localStorage.getItem('tc_users')) || [];
+                orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+                orders = orders.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+            }
+
+            if (orders.length === 0) {
+                recentOrdersList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--text-muted);">No orders placed yet.</td></tr>';
+                return;
+            }
+
+            const getStatusClass = (status) => {
+                if (!status) return 'pending';
+                const s = status.toLowerCase();
+                if (s === 'paid' || s === 'completed' || s === 'approved') return 'approved';
+                if (s === 'cancelled' || s === 'rejected') return 'rejected';
+                return 'pending';
+            };
+
+            recentOrdersList.innerHTML = orders.map(o => {
+                const customer = users.find(u => u.id === o.customer_id || u.id === o.customerId);
+                const businessName = customer ? (customer.business_name || customer.businessName) : 'Unknown Partner';
+                const totalAmount = parseFloat(o.total || 0).toFixed(2);
+                const dateStr = new Date(o.created_at || o.createdAt).toLocaleDateString();
+
+                return `
                     <tr>
                         <td><div class="user-info-main">#${o.id}</div></td>
-                        <td>${o.user}</td>
-                        <td>${o.total}</td>
-                        <td><span class="badge badge-${o.status}">${o.status}</span></td>
-                        <td>${o.date}</td>
+                        <td>${businessName}</td>
+                        <td>$${totalAmount}</td>
+                        <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
+                        <td>${dateStr}</td>
                     </tr>
-                `).join('');
-            }
+                `;
+            }).join('');
         });
     </script>
 </body>

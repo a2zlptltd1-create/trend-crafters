@@ -55,8 +55,9 @@ const B2B_NOTIFY = {
 
     // 2. Account Approval
     onApproval(user) {
+        const baseUrl = window.location.href.split('/').slice(0, -1).join('/');
         this.sendEmail(user.email, 'Your Trend Crafters account has been approved', 
-            `Congratulations! Your wholesale account is now active. Log in to view products: ${window.location.origin}/login.html`, 'success');
+            `Congratulations! Your wholesale account is now active. Log in to view products: ${baseUrl}/login.html`, 'success');
     },
 
     // 3. Account Rejection
@@ -67,7 +68,8 @@ const B2B_NOTIFY = {
 
     // 4. Order Generation
     onOrderGenerated(order, customer, product) {
-        const link = `${window.location.origin}/${order.checkoutUrl}`;
+        const baseUrl = window.location.href.split('/').slice(0, -1).join('/');
+        const link = `${baseUrl}/${order.checkoutUrl}`;
         const body = `
             Hi ${customer.fullname},
             

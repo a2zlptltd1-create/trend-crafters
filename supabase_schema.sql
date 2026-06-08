@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     total DECIMAL(10, 2) NOT NULL,
     payment_link TEXT,
     button_text TEXT DEFAULT 'Pay Now' NOT NULL,
+    open_in_new_tab BOOLEAN DEFAULT TRUE NOT NULL,
     notes TEXT,
     status TEXT DEFAULT 'Pending' CHECK (status IN ('Draft', 'Generated', 'Sent', 'Pending', 'Paid', 'Processing', 'Completed', 'Cancelled')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -61,12 +62,37 @@ CREATE TABLE IF NOT EXISTS public.orders (
 -- Enable RLS for Orders
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
+-- 4. Create Order Activity Logs Table
+CREATE TABLE IF NOT EXISTS public.order_activity_logs (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    order_id TEXT REFERENCES public.orders(id) ON DELETE CASCADE,
+    action TEXT NOT NULL,
+    performed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Order Activity Logs
+ALTER TABLE public.order_activity_logs ENABLE ROW LEVEL SECURITY;
+
 -- 4. Enable RLS Policies
 
+-- Helper function to check if the current user is an admin.
+-- Using SECURITY DEFINER to run with creator privileges, bypassing RLS
+-- to prevent infinite recursion on the profiles table.
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Profiles Policies:
--- Allow everyone to read profiles (needed for authentication status checks)
-CREATE POLICY "Allow public read access to profiles" ON public.profiles
-    FOR SELECT USING (true);
+-- Allow select access only to the user themselves or to authorized admins
+CREATE POLICY "Allow select access to own profile or admins" ON public.profiles
+    FOR SELECT USING (auth.uid() = id OR public.is_admin());
 
 -- Allow users to insert their own profile
 CREATE POLICY "Allow users to insert their own profile" ON public.profiles
@@ -78,46 +104,43 @@ CREATE POLICY "Allow users to update own profile" ON public.profiles
 
 -- Allow admins to do everything on profiles
 CREATE POLICY "Admins have full access to profiles" ON public.profiles
-    ALL USING (
-        EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND role = 'admin'
-        )
-    );
+    ALL USING (public.is_admin());
 
 -- Products Policies:
--- Allow anyone to read active products
+-- Allow anyone to read active products or allow admins full access
 CREATE POLICY "Allow public read active products" ON public.products
-    FOR SELECT USING (status = 'active' OR EXISTS (
-        SELECT 1 FROM public.profiles 
-        WHERE id = auth.uid() AND role = 'admin'
-    ));
+    FOR SELECT USING (status = 'active' OR public.is_admin());
 
 -- Allow admins to do everything on products
 CREATE POLICY "Admins have full access to products" ON public.products
-    ALL USING (
-        EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND role = 'admin'
-        )
-    );
+    ALL USING (public.is_admin());
 
 -- Orders Policies:
--- Customers can view their own orders
+-- Customers can view their own orders, admins can view all orders
 CREATE POLICY "Allow users to select their own orders" ON public.orders
-    FOR SELECT USING (customer_id = auth.uid() OR EXISTS (
-        SELECT 1 FROM public.profiles 
-        WHERE id = auth.uid() AND role = 'admin'
-    ));
+    FOR SELECT USING (customer_id = auth.uid() OR public.is_admin());
+
+-- Allow users to insert their own orders
+CREATE POLICY "Allow users to insert their own orders" ON public.orders
+    FOR INSERT WITH CHECK (customer_id = auth.uid());
 
 -- Allow admins to do everything on orders
 CREATE POLICY "Admins have full access to orders" ON public.orders
-    ALL USING (
+    ALL USING (public.is_admin());
+
+-- Order Activity Logs Policies
+-- Allow customers to select logs for their own orders
+CREATE POLICY "Allow users to select logs for their own orders" ON public.order_activity_logs
+    FOR SELECT USING (
         EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND role = 'admin'
+            SELECT 1 FROM public.orders 
+            WHERE id = order_id AND (customer_id = auth.uid() OR public.is_admin())
         )
     );
+
+-- Allow admins full access to order logs
+CREATE POLICY "Admins have full access to order logs" ON public.order_activity_logs
+    ALL USING (public.is_admin());
 
 -- 5. Trigger to handle new user registration in auth.users
 -- This automatically inserts a new profile row when a user signs up via Supabase Auth

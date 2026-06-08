@@ -33,10 +33,20 @@
             </div>
         </aside>
 
+        <!-- Sidebar Mobile Overlay -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Mock Admin Warning Banner (Dynamically shown) -->
+            <div id="mock-admin-warning" class="banner banner-warning" style="display: none; padding: 1.2rem; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 8px; margin-bottom: 2rem; font-size: 0.88rem; line-height: 1.5;">
+                <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem; color: #c5a059;"></i> 
+                <strong>Mock Session Active:</strong> You are logged in with offline mock admin credentials. Database write actions (approving users, updating order status, deleting products) will be rejected by Supabase RLS policies. To write to the live database, create a user in Supabase Auth, change their role to <code>admin</code> in the profiles table, and login.
+            </div>
+
             <!-- Top Header -->
             <header class="dashboard-header">
+                <button id="admin-sidebar-toggle" class="sidebar-toggle-btn" style="display: none;" aria-label="Toggle Navigation"><i class="fa-solid fa-bars"></i></button>
                 <h1 id="tab-title">Dashboard Overview</h1>
                 <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
                     <span id="admin-name" style="font-weight: 600; font-size: 0.9rem;">System Admin</span>
@@ -541,6 +551,28 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await window.updateDashboardStats();
+
+            // Mock Admin Warning Banner Trigger
+            const currentUser = JSON.parse(localStorage.getItem('tc_current_user'));
+            if (currentUser && currentUser.id === 'admin-001') {
+                const warningBanner = document.getElementById('mock-admin-warning');
+                if (warningBanner) warningBanner.style.display = 'block';
+            }
+
+            // Mobile Sidebar Toggle
+            const toggleBtn = document.getElementById('admin-sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (toggleBtn && sidebar && overlay) {
+                const toggleSidebar = () => {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                };
+
+                toggleBtn.addEventListener('click', toggleSidebar);
+                overlay.addEventListener('click', toggleSidebar);
+            }
 
             // Populate Recent Orders from Live Database
             const recentOrdersList = document.getElementById('recent-orders-list');

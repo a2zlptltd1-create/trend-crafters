@@ -85,6 +85,7 @@ const B2B_PRODUCTS = {
         await this.loadProducts();
         this.renderAdminProducts();
         this.setupEventListeners();
+        document.dispatchEvent(new CustomEvent('tc_products_loaded'));
     },
 
     saveLocalCache() {

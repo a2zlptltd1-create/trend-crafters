@@ -134,6 +134,13 @@ const B2B_AUTH = {
                 createdAt: new Date().toISOString()
             };
 
+            // Save to offline tc_users cache
+            const offlineUsers = JSON.parse(localStorage.getItem('tc_users')) || [];
+            if (!offlineUsers.some(u => u.id === userId)) {
+                offlineUsers.push(newUser);
+                localStorage.setItem('tc_users', JSON.stringify(offlineUsers));
+            }
+
             // Notify Admin & User (Simulated Email & Toast Alerts)
             if (typeof B2B_NOTIFY !== 'undefined') {
                 B2B_NOTIFY.onSignup(newUser);
@@ -147,7 +154,67 @@ const B2B_AUTH = {
     },
 
     async login(email, password) {
-        // Fallback for default admin during development/testing
+        // 1. Try authenticating via Supabase Auth first (to support real DB admin accounts)
+        if (window.supabaseClient) {
+            try {
+                const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (!error && data.user) {
+                    const user = data.user;
+
+                    // Retrieve profile to check approval status and role
+                    const { data: profile, error: profError } = await window.supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (!profError && profile) {
+                        // Admins can log in regardless of status checks
+                        if (profile.role !== 'admin') {
+                            if (profile.status === 'pending') {
+                                await window.supabaseClient.auth.signOut();
+                                return { success: false, message: 'Your account is pending approval.', status: 'pending' };
+                            }
+
+                            if (profile.status === 'rejected') {
+                                await window.supabaseClient.auth.signOut();
+                                return { success: false, message: 'Your account request was not approved.', status: 'rejected' };
+                            }
+
+                            if (profile.status === 'deactivated') {
+                                await window.supabaseClient.auth.signOut();
+                                return { success: false, message: 'Your account has been deactivated.', status: 'deactivated' };
+                            }
+                        }
+
+                        // Login successful
+                        const loggedInUser = {
+                            id: user.id,
+                            fullname: profile.fullname,
+                            email: user.email,
+                            businessName: profile.business_name,
+                            businessType: profile.business_type,
+                            phone: profile.phone,
+                            country: profile.country,
+                            role: profile.role,
+                            status: profile.status
+                        };
+
+                        this.currentUser = loggedInUser;
+                        localStorage.setItem('tc_current_user', JSON.stringify(loggedInUser));
+                        return { success: true, user: loggedInUser };
+                    }
+                }
+            } catch (err) {
+                console.warn("Supabase auth login exception, trying local fallback:", err);
+            }
+        }
+
+        // 2. Local Fallback for admin during development/testing/offline
         if (email === 'admin@trendcrafters.us' && password === 'admin') {
             const adminUser = {
                 id: 'admin-001',
@@ -165,65 +232,7 @@ const B2B_AUTH = {
             return { success: false, message: 'Authentication service not available.' };
         }
 
-        try {
-            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-                email,
-                password
-            });
-
-            if (error) {
-                return { success: false, message: error.message };
-            }
-
-            const user = data.user;
-
-            // Retrieve profile to check approval status
-            const { data: profile, error: profError } = await window.supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single();
-
-            if (profError || !profile) {
-                await window.supabaseClient.auth.signOut();
-                return { success: false, message: 'User profile not found. Please register.' };
-            }
-
-            if (profile.status === 'pending') {
-                await window.supabaseClient.auth.signOut();
-                return { success: false, message: 'Your account is pending approval.', status: 'pending' };
-            }
-
-            if (profile.status === 'rejected') {
-                await window.supabaseClient.auth.signOut();
-                return { success: false, message: 'Your account request was not approved.', status: 'rejected' };
-            }
-
-            if (profile.status === 'deactivated') {
-                await window.supabaseClient.auth.signOut();
-                return { success: false, message: 'Your account has been deactivated.', status: 'deactivated' };
-            }
-
-            // Login successful
-            const loggedInUser = {
-                id: user.id,
-                fullname: profile.fullname,
-                email: user.email,
-                businessName: profile.business_name,
-                businessType: profile.business_type,
-                phone: profile.phone,
-                country: profile.country,
-                role: profile.role,
-                status: profile.status
-            };
-
-            this.currentUser = loggedInUser;
-            localStorage.setItem('tc_current_user', JSON.stringify(loggedInUser));
-            return { success: true, user: loggedInUser };
-        } catch (err) {
-            console.error("Login exception:", err);
-            return { success: false, message: 'An unexpected authentication error occurred.' };
-        }
+        return { success: false, message: 'Invalid credentials. Please verify and try again.' };
     },
 
     async logout() {
@@ -357,30 +366,56 @@ const B2B_AUTH = {
         if (!userList) return;
 
         const fetchAndRender = async () => {
-            if (!window.supabaseClient) return;
+            let users = [];
+
+            if (window.supabaseClient) {
+                try {
+                    let { data: dbUsers, error } = await window.supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .neq('role', 'admin'); // Exclude administrator rows from customer table
+
+                    if (error) {
+                        console.error("Error reading profiles:", error);
+                        throw error;
+                    }
+
+                    if (dbUsers) {
+                        users = dbUsers.map(u => ({
+                            id: u.id,
+                            fullname: u.fullname,
+                            email: u.email,
+                            businessName: u.business_name,
+                            businessType: u.business_type,
+                            phone: u.phone,
+                            country: u.country,
+                            role: u.role,
+                            status: u.status,
+                            createdAt: u.created_at
+                        }));
+                        localStorage.setItem('tc_users', JSON.stringify(users));
+                    }
+                } catch (err) {
+                    console.warn("Exception fetching admin users list, falling back to local storage:", err);
+                    users = JSON.parse(localStorage.getItem('tc_users')) || [];
+                }
+            } else {
+                users = JSON.parse(localStorage.getItem('tc_users')) || [];
+            }
 
             try {
-                let { data: dbUsers, error } = await window.supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .neq('role', 'admin'); // Exclude administrator rows from customer table
-
-                if (error) {
-                    console.error("Error reading profiles:", error);
-                    return;
-                }
-
                 const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
                 const filterVal = filterStatus ? filterStatus.value : 'all';
 
-                let filtered = dbUsers || [];
+                let filtered = users;
 
                 if (searchVal) {
-                    filtered = filtered.filter(u => 
-                        u.fullname.toLowerCase().includes(searchVal) ||
-                        (u.email && u.email.toLowerCase().includes(searchVal)) ||
-                        u.business_name.toLowerCase().includes(searchVal)
-                    );
+                    filtered = filtered.filter(u => {
+                        const bName = u.businessName || u.business_name || '';
+                        return u.fullname.toLowerCase().includes(searchVal) ||
+                            (u.email && u.email.toLowerCase().includes(searchVal)) ||
+                            bName.toLowerCase().includes(searchVal);
+                    });
                 }
 
                 if (filterVal !== 'all') {
@@ -399,8 +434,8 @@ const B2B_AUTH = {
                             <div class="user-info-sub">${u.email || ''}</div>
                         </td>
                         <td>
-                            <div class="user-info-main">${u.business_name}</div>
-                            <div class="user-info-sub">${u.business_type} | ${u.country}</div>
+                            <div class="user-info-main">${u.businessName || u.business_name || 'N/A'}</div>
+                            <div class="user-info-sub">${u.businessType || u.business_type || 'N/A'} | ${u.country || 'N/A'}</div>
                         </td>
                         <td><span class="badge badge-${u.status}">${u.status}</span></td>
                         <td class="action-btns">
@@ -419,7 +454,7 @@ const B2B_AUTH = {
                     </tr>
                 `).join('');
             } catch (err) {
-                console.error("Exception fetching admin users list:", err);
+                console.error("Exception rendering admin users list:", err);
             }
         };
 
@@ -615,3 +650,33 @@ B2B_AUTH.init();
 
 // Global Logout hook
 window.logoutUser = () => B2B_AUTH.logout();
+
+// Global Toast System
+window.showToast = function(message, type = 'success') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+    
+    toast.innerHTML = `
+        <i class="fa-solid ${icon}"></i>
+        <div class="toast-message">${message}</div>
+    `;
+
+    container.appendChild(toast);
+
+    // Animate in
+    setTimeout(() => toast.classList.add('active'), 10);
+
+    // Remove after 3s
+    setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => toast.remove(), 400);
+    }, 3000);
+};

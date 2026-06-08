@@ -217,6 +217,38 @@
             const grid = document.getElementById('main-product-grid');
             if (!grid) return;
 
+            // Define global shop state for script.js to interact with
+            window.shopState = {
+                activeCategory: 'all',
+                activeSearch: '',
+                render: () => renderCatalog()
+            };
+
+            // Reset filters utility
+            window.resetShopFilters = () => {
+                window.shopState.activeCategory = 'all';
+                window.shopState.activeSearch = '';
+                
+                // Reset categories UI
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    if (btn.getAttribute('data-filter') === 'all') {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                // Clear input
+                const searchInput = document.getElementById('global-search-input');
+                if (searchInput) searchInput.value = '';
+
+                // Remove old no results message if exists
+                const noResults = document.getElementById('no-results-msg');
+                if (noResults) noResults.remove();
+
+                renderCatalog();
+            };
+
             // Helper to map DB categories to Shop filter categories
             const getFilterCategory = (cat, name) => {
                 if (!cat) return 't-shirt';
@@ -230,39 +262,76 @@
                 return c; // accessories etc.
             };
 
-            const products = B2B_PRODUCTS.products.filter(p => p.status === 'active');
+            const renderCatalog = () => {
+                let products = B2B_PRODUCTS.products.filter(p => p.status === 'active');
 
-            if (products.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: var(--text-muted);"><h3>Catalog coming soon.</h3><p>Our team is currently updating the wholesale inventory.</p></div>';
-                return;
-            }
+                // 1. Filter by category
+                if (window.shopState.activeCategory !== 'all') {
+                    products = products.filter(p => {
+                        const uiCategory = getFilterCategory(p.category, p.name);
+                        return uiCategory === window.shopState.activeCategory;
+                    });
+                }
 
-            grid.innerHTML = products.map(p => {
-                const uiCategory = getFilterCategory(p.category, p.name);
-                return `
-                    <div class="product-card" data-id="${p.id}" data-category="${uiCategory}" data-moq="${p.moq}">
-                        <div class="product-img">
-                            <img src="${p.image}" alt="${p.name}">
-                            <div class="product-badge" style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-navy); color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">MOQ: ${p.moq}</div>
-                            <button class="add-to-cart" aria-label="Add ${p.name} to cart">
-                                <i class="fa-solid fa-cart-plus"></i>
-                            </button>
+                // 2. Filter by search query
+                if (window.shopState.activeSearch) {
+                    const query = window.shopState.activeSearch.toLowerCase().trim();
+                    products = products.filter(p => {
+                        const name = p.name.toLowerCase();
+                        const desc = p.description.toLowerCase();
+                        const sku = p.sku.toLowerCase();
+                        return name.includes(query) || desc.includes(query) || sku.includes(query);
+                    });
+                }
+
+                // 3. No Results Handling
+                if (products.length === 0) {
+                    grid.innerHTML = `
+                        <div id="no-results-msg" style="grid-column: 1/-1; text-align: center; padding: 5rem 2rem; width: 100%;">
+                            <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                            <h3>No products found</h3>
+                            <p style="color: #666; margin-top: 0.5rem;">Try adjusting your category filters or search query.</p>
+                            <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="window.resetShopFilters()">Reset Filters</button>
                         </div>
-                        <div class="product-info">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                                <h3>${p.name}</h3>
-                                <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">SKU: ${p.sku}</span>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = products.map(p => {
+                    const uiCategory = getFilterCategory(p.category, p.name);
+                    return `
+                        <div class="product-card" data-id="${p.id}" data-category="${uiCategory}" data-moq="${p.moq}">
+                            <div class="product-img">
+                                <img src="${p.image}" alt="${p.name}">
+                                <div class="product-badge" style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-navy); color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">MOQ: ${p.moq}</div>
+                                <button class="add-to-cart" aria-label="Add ${p.name} to cart">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                </button>
                             </div>
-                            <p class="price">$${parseFloat(p.basePrice).toFixed(2)}</p>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 1rem 0;">${p.description}</p>
+                            <div class="product-info">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                    <h3>${p.name}</h3>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">SKU: ${p.sku}</span>
+                                </div>
+                                <p class="price">$${parseFloat(p.basePrice).toFixed(2)}</p>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 1rem 0;">${p.description}</p>
+                            </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
 
-            // Apply URL search & filter params after rendering
-            if (window.applyShopUrlParams) {
-                window.applyShopUrlParams();
+                // Apply URL search & filter params after rendering (only run on first load)
+                if (window.applyShopUrlParams && !window.shopState.paramsApplied) {
+                    window.shopState.paramsApplied = true;
+                    window.applyShopUrlParams();
+                }
+            };
+
+            // Render immediately if already loaded, otherwise wait for products
+            if (B2B_PRODUCTS.products && B2B_PRODUCTS.products.length > 0) {
+                renderCatalog();
+            } else {
+                document.addEventListener('tc_products_loaded', renderCatalog);
             }
         });
     </script>

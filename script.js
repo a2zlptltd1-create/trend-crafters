@@ -2,30 +2,7 @@
 let cart = JSON.parse(localStorage.getItem('trendCraftersCart')) || [];
 
 // --- UTILS: TOAST SYSTEM ---
-function showToast(message, type = 'success') {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
-    
-    toast.innerHTML = `
-        <i class="fa-solid ${icon}"></i>
-        <div class="toast-message">${message}</div>
-    `;
-
-    container.appendChild(toast);
-
-    // Animate in
-    setTimeout(() => toast.classList.add('active'), 10);
-
-    // Remove after 3s
-    setTimeout(() => {
-        toast.classList.remove('active');
-        setTimeout(() => toast.remove(), 400);
-    }, 3000);
-}
+// Remotely managed in auth.js to be globally accessible on all pages.
 
 // --- CART LOGIC ---
 function updateCartUI() {
@@ -158,52 +135,58 @@ function performSearch(query) {
     if (!query) return;
 
     if (window.location.pathname.includes('shop.html')) {
-        const products = document.querySelectorAll('.product-card');
-        let foundCount = 0;
-        
-        products.forEach(card => {
-            const name = card.querySelector('h3').textContent.toLowerCase();
-            const category = card.getAttribute('data-category')?.toLowerCase() || "";
+        if (window.shopState) {
+            window.shopState.activeSearch = query;
+            window.shopState.render();
+            closeSearchModal();
+        } else {
+            const products = document.querySelectorAll('.product-card');
+            let foundCount = 0;
             
-            if (name.includes(query) || category.includes(query)) {
-                card.style.display = 'block';
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'scale(1)';
-                }, 10);
-                foundCount++;
-            } else {
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.8)';
-                setTimeout(() => {
-                    card.style.display = 'none';
-                }, 400);
-            }
-        });
+            products.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const category = card.getAttribute('data-category')?.toLowerCase() || "";
+                
+                if (name.includes(query) || category.includes(query)) {
+                    card.style.display = 'block';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'scale(1)';
+                    }, 10);
+                    foundCount++;
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 400);
+                }
+            });
 
-        // No Results Handling
-        let noResults = document.getElementById('no-results-msg');
-        if (foundCount === 0) {
-            if (!noResults) {
-                noResults = document.createElement('div');
-                noResults.id = 'no-results-msg';
-                noResults.style.textAlign = 'center';
-                noResults.style.padding = '5rem 2rem';
-                noResults.style.width = '100%';
-                noResults.innerHTML = `
-                    <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
-                    <h3>No products found for "${query}"</h3>
-                    <p style="color: #666;">Try searching for T-shirts, Sneakers, or Pants.</p>
-                    <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="location.reload()">Clear Search</button>
-                `;
-                const grid = document.getElementById('main-product-grid');
-                if (grid) grid.appendChild(noResults);
+            // No Results Handling
+            let noResults = document.getElementById('no-results-msg');
+            if (foundCount === 0) {
+                if (!noResults) {
+                    noResults = document.createElement('div');
+                    noResults.id = 'no-results-msg';
+                    noResults.style.textAlign = 'center';
+                    noResults.style.padding = '5rem 2rem';
+                    noResults.style.width = '100%';
+                    noResults.innerHTML = `
+                        <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                        <h3>No products found for "${query}"</h3>
+                        <p style="color: #666;">Try searching for T-shirts, Sneakers, or Pants.</p>
+                        <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="location.reload()">Clear Search</button>
+                    `;
+                    const grid = document.getElementById('main-product-grid');
+                    if (grid) grid.appendChild(noResults);
+                }
+            } else if (noResults) {
+                noResults.remove();
             }
-        } else if (noResults) {
-            noResults.remove();
+            
+            closeSearchModal();
         }
-        
-        closeSearchModal();
     } else {
         window.location.href = `shop.html?search=${encodeURIComponent(query)}`;
     }
@@ -225,6 +208,10 @@ function closeSearchModal() {
 
 // --- CHECKOUT SUMMARY ---
 function renderCheckoutSummary() {
+    // If orderId is present in URL, this is a custom B2B checkout invoice, so skip rendering cart summary
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('orderId')) return;
+
     const mainGrid = document.getElementById('checkout-main-grid');
     const emptyView = document.getElementById('empty-checkout-view');
     const itemsContainer = document.getElementById('checkout-items');
@@ -264,12 +251,28 @@ function renderCheckoutSummary() {
 window.applyShopUrlParams = function() {
     const urlParams = new URLSearchParams(window.location.search);
     const q = urlParams.get('search');
-    if (q) performSearch(q);
-
     const filterParam = urlParams.get('filter');
-    if (filterParam) {
-        const btn = document.querySelector(`.filter-btn[data-filter="${filterParam}"]`);
-        if (btn) btn.click();
+
+    if (window.shopState) {
+        if (q) window.shopState.activeSearch = q;
+        if (filterParam) {
+            window.shopState.activeCategory = filterParam;
+            // update filter buttons UI state
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                if (b.getAttribute('data-filter') === filterParam) {
+                    b.classList.add('active');
+                } else {
+                    b.classList.remove('active');
+                }
+            });
+        }
+        window.shopState.render();
+    } else {
+        if (q) performSearch(q);
+        if (filterParam) {
+            const btn = document.querySelector(`.filter-btn[data-filter="${filterParam}"]`);
+            if (btn) btn.click();
+        }
     }
 };
 
@@ -277,56 +280,58 @@ function updateHomepagePrices() {
     const user = JSON.parse(localStorage.getItem('tc_current_user'));
     const isApproved = user && (user.role === 'admin' || user.status === 'approved');
     
-    const p1Card = document.querySelector('.product-card[data-id="p1"]');
-    const p2Card = document.querySelector('.product-card[data-id="p2"]');
-    const p3Card = document.querySelector('.product-card[data-id="p3"]');
-    const p4Card = document.querySelector('.product-card[data-id="p4"]');
+    const productPrices = {
+        'p1': { price: '$29.99', name: 'Urban Essential T-Shirt' },
+        'p2': { price: '$129.99', name: 'Velocity Pro Sneakers' },
+        'p3': { price: '$59.99', name: 'Classic Denim Jeans' },
+        'p4': { price: '$199.99', name: 'Premium Leather Jacket' }
+    };
 
-    if (isApproved) {
-        if (p1Card) {
-            const priceEl = p1Card.querySelector('.price');
+    Object.keys(productPrices).forEach(id => {
+        const card = document.querySelector(`.product-card[data-id="${id}"]`);
+        if (!card) return;
+
+        if (isApproved) {
+            // Unlock: Show price and add to cart button, remove Login CTA
+            const priceEl = card.querySelector('.price');
             if (priceEl) {
-                priceEl.textContent = '$29.99';
+                priceEl.textContent = productPrices[id].price;
                 priceEl.style.fontSize = '';
                 priceEl.style.color = '';
             }
-            const imgContainer = p1Card.querySelector('.product-img');
+            const imgContainer = card.querySelector('.product-img');
             if (imgContainer && !imgContainer.querySelector('.add-to-cart')) {
                 imgContainer.style.position = 'relative';
                 const btn = document.createElement('button');
                 btn.className = 'add-to-cart';
-                btn.setAttribute('aria-label', 'Add Urban Essential T-Shirt to cart');
+                btn.setAttribute('aria-label', `Add ${productPrices[id].name} to cart`);
                 btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i>';
                 imgContainer.appendChild(btn);
             }
-            const btn = p1Card.querySelector('.btn');
-            if (btn) btn.remove();
-        }
-    } else {
-        const cardsToLock = [p2Card, p3Card, p4Card];
-        cardsToLock.forEach(card => {
-            if (card) {
-                const cartBtn = card.querySelector('.add-to-cart');
-                if (cartBtn) cartBtn.remove();
-                
-                const priceEl = card.querySelector('.price');
-                if (priceEl) {
-                    priceEl.textContent = 'Login for Wholesale Price';
-                    priceEl.style.fontSize = '0.9rem';
-                    priceEl.style.color = 'var(--text-muted)';
-                }
-                const infoContainer = card.querySelector('.product-info');
-                if (infoContainer && !infoContainer.querySelector('.btn')) {
-                    const btn = document.createElement('a');
-                    btn.href = 'login.html';
-                    btn.className = 'btn btn-outline btn-sm';
-                    btn.style.cssText = 'width: 100%; margin-top: 1rem;';
-                    btn.textContent = 'View Details';
-                    infoContainer.appendChild(btn);
-                }
+            const viewDetailsBtn = card.querySelector('.btn');
+            if (viewDetailsBtn) viewDetailsBtn.remove();
+        } else {
+            // Lock: Hide cart button, show Login placeholder, add Login CTA
+            const cartBtn = card.querySelector('.add-to-cart');
+            if (cartBtn) cartBtn.remove();
+            
+            const priceEl = card.querySelector('.price');
+            if (priceEl) {
+                priceEl.textContent = 'Login for Wholesale Price';
+                priceEl.style.fontSize = '0.9rem';
+                priceEl.style.color = 'var(--text-muted)';
             }
-        });
-    }
+            const infoContainer = card.querySelector('.product-info');
+            if (infoContainer && !infoContainer.querySelector('.btn')) {
+                const btn = document.createElement('a');
+                btn.href = 'login.html';
+                btn.className = 'btn btn-outline btn-sm';
+                btn.style.cssText = 'width: 100%; margin-top: 1rem;';
+                btn.textContent = 'View Details';
+                infoContainer.appendChild(btn);
+            }
+        }
+    });
 }
 
 // --- INITIALIZATION ---
@@ -398,7 +403,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const syncCartToSupabase = async () => {
                 const user = JSON.parse(localStorage.getItem('tc_current_user'));
-                if (window.supabaseClient && user) {
+                // Skip Supabase syncing if the user is the mock admin 'admin-001' (not a valid UUID)
+                if (window.supabaseClient && user && user.id !== 'admin-001') {
                     try {
                         const products = (typeof B2B_PRODUCTS !== 'undefined' ? B2B_PRODUCTS.products : []) || [];
                         for (const item of cart) {
@@ -482,17 +488,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
-                document.querySelectorAll('.product-card').forEach(card => {
-                    const cat = card.getAttribute('data-category');
-                    if (filter === 'all' || cat === filter) {
-                        card.style.display = 'block';
-                        setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'scale(1)'; }, 10);
-                    } else {
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.8)';
-                        setTimeout(() => { card.style.display = 'none'; }, 400);
-                    }
-                });
+                if (window.shopState) {
+                    window.shopState.activeCategory = filter;
+                    window.shopState.render();
+                } else {
+                    document.querySelectorAll('.product-card').forEach(card => {
+                        const cat = card.getAttribute('data-category');
+                        if (filter === 'all' || cat === filter) {
+                            card.style.display = 'block';
+                            setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'scale(1)'; }, 10);
+                        } else {
+                            card.style.opacity = '0';
+                            card.style.transform = 'scale(0.8)';
+                            setTimeout(() => { card.style.display = 'none'; }, 400);
+                        }
+                    });
+                }
             });
         });
     }
@@ -525,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevBtn = document.querySelector('.hero-prev');
     const nextBtn = document.querySelector('.hero-next');
     let currentSlide = 0;
+    let sliderInterval;
 
     if (slides.length > 0) {
         function showSlide(n) {
@@ -536,15 +548,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (dots[currentSlide]) dots[currentSlide].classList.add('active');
         }
 
-        if (nextBtn) nextBtn.addEventListener('click', () => showSlide(currentSlide + 1));
-        if (prevBtn) prevBtn.addEventListener('click', () => showSlide(currentSlide - 1));
+        function startSliderTimer() {
+            if (sliderInterval) clearInterval(sliderInterval);
+            sliderInterval = setInterval(() => showSlide(currentSlide + 1), 5000);
+        }
+
+        function handleManualTransition(nextSlideIndex) {
+            showSlide(nextSlideIndex);
+            startSliderTimer();
+        }
+
+        if (nextBtn) nextBtn.addEventListener('click', () => handleManualTransition(currentSlide + 1));
+        if (prevBtn) prevBtn.addEventListener('click', () => handleManualTransition(currentSlide - 1));
         
         dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => showSlide(index));
+            dot.addEventListener('click', () => handleManualTransition(index));
         });
 
-        // Auto-advance slider every 5 seconds
-        setInterval(() => showSlide(currentSlide + 1), 5000);
+        // Start initial auto-advance slider timer
+        startSliderTimer();
     }
 
     // Scroll Reveal Animation (Intersection Observer)

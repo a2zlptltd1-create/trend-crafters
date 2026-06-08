@@ -28,10 +28,14 @@
         </div>
     </aside>
 
+    <!-- Sidebar Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
     <!-- Main Content -->
     <main class="main-content">
         <!-- Top Header -->
         <header class="dashboard-header">
+            <button id="portal-sidebar-toggle" class="sidebar-toggle-btn" style="display: none;" aria-label="Toggle Navigation"><i class="fa-solid fa-bars"></i></button>
             <h1 id="portal-title">Welcome back, <span id="partner-name">...</span></h1>
             <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
                 <span style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted);" id="partner-company">...</span>
@@ -170,6 +174,21 @@
             document.getElementById('prof-business').textContent = user.businessName;
             document.getElementById('prof-type').textContent = user.businessType;
             document.getElementById('prof-country').textContent = user.country;
+
+            // Mobile Sidebar Toggle
+            const toggleBtn = document.getElementById('portal-sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (toggleBtn && sidebar && overlay) {
+                const toggleSidebar = () => {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                };
+
+                toggleBtn.addEventListener('click', toggleSidebar);
+                overlay.addEventListener('click', toggleSidebar);
+            }
 
             renderPortalOrders(user.id);
         });

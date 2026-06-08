@@ -43,6 +43,7 @@ const B2B_ORDERS = {
                 total: parseFloat(o.total),
                 paymentLink: o.payment_link,
                 buttonText: o.button_text,
+                openInNewTab: o.open_in_new_tab,
                 notes: o.notes,
                 status: o.status,
                 createdAt: o.created_at,
@@ -78,6 +79,7 @@ const B2B_ORDERS = {
             total,
             paymentLink: orderData.paymentLink,
             buttonText: orderData.buttonText,
+            openInNewTab: orderData.openInNewTab,
             notes: orderData.notes,
             status: 'Generated',
             createdAt: new Date().toISOString(),
@@ -109,6 +111,7 @@ const B2B_ORDERS = {
                 total,
                 payment_link: orderData.paymentLink,
                 button_text: orderData.buttonText,
+                open_in_new_tab: orderData.openInNewTab,
                 notes: orderData.notes,
                 status: 'Generated'
             };
@@ -255,9 +258,11 @@ const B2B_ORDERS = {
         const form = document.getElementById('generate-order-form');
         if (!form) return;
 
-        // Populate Products Dropdown
-        const prodSelect = document.getElementById('order-product');
-        if (prodSelect) {
+        // Populate Products Dropdown Helper
+        const populateProductsDropdown = () => {
+            const prodSelect = document.getElementById('order-product');
+            if (!prodSelect) return;
+            const currentSelected = prodSelect.value;
             prodSelect.innerHTML = '<option value="">Select a product...</option>';
             const products = JSON.parse(localStorage.getItem('tc_products')) || [];
             products.forEach(p => {
@@ -265,8 +270,18 @@ const B2B_ORDERS = {
                 opt.value = p.id;
                 opt.dataset.price = p.basePrice;
                 opt.textContent = `${p.name} (SKU: ${p.sku})`;
+                if (p.id === currentSelected) opt.selected = true;
                 prodSelect.appendChild(opt);
             });
+        };
+
+        // Populate Products Dropdown
+        const prodSelect = document.getElementById('order-product');
+        if (prodSelect) {
+            populateProductsDropdown();
+
+            // Listen to dynamic products loaded event
+            document.addEventListener('tc_products_loaded', populateProductsDropdown);
 
             // Price Auto-fill trigger
             prodSelect.addEventListener('change', (e) => {

@@ -3,28 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:static": "npx serve .",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "lucide-react": "^0.300.0",
-    "@supabase/supabase-js": "^2.39.0",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.2.0"
-  },
-  "devDependencies": {
-    "typescript": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "postcss": "latest",
-    "tailwindcss": "latest",
-    "autoprefixer": "latest"
+    "dev": "npx serve ."
   }
 }

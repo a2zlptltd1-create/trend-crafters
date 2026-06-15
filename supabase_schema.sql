@@ -144,9 +144,54 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+-- 6. Security Triggers on Profiles to prevent privilege escalation
+-- Prevent non-admin users from changing their own role or status
+CREATE OR REPLACE FUNCTION public.check_profile_updates()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NOT public.is_admin() THEN
+    NEW.role := OLD.role;
+    NEW.status := OLD.status;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER check_profile_updates_trigger
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.check_profile_updates();
+
+-- Force role to 'user' and status to 'pending' on registration inserts
+CREATE OR REPLACE FUNCTION public.clean_new_profile()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM public.profiles WHERE role = 'admin') THEN
+    IF NOT public.is_admin() THEN
+      NEW.role := 'user';
+      NEW.status := 'pending';
+    END IF;
+  ELSE
+    -- Bootstrap the first user as admin if no admin exists
+    IF NEW.role IS NULL THEN
+      NEW.role := 'user';
+    END IF;
+    IF NEW.status IS NULL THEN
+      NEW.status := 'pending';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER clean_new_profile_trigger
+  BEFORE INSERT ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.clean_new_profile();
+
+
 -- Insert Sample Products into the products table
 INSERT INTO public.products (name, sku, category, description, image, base_price, moq, status)
 VALUES 
 ('Urban Essential T-Shirt', 'TC-TSH-001', 'Apparel', 'Premium heavy-weight cotton t-shirt for urban brands.', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=1000', 29.99, 100, 'active'),
 ('Velocity Pro Sneakers', 'TC-SNK-002', 'Footwear', 'High-performance sneakers with breathable mesh.', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000', 129.99, 50, 'active')
 ON CONFLICT (sku) DO NOTHING;
+

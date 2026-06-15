@@ -195,8 +195,9 @@ function updateNavAuth() {
     const user = JSON.parse(localStorage.getItem('tc_current_user'));
 
     if (user) {
+        const dashboardLink = user.role === 'admin' ? 'admin.html' : 'portal.html';
         authCtas.innerHTML = `
-            <a href="portal.html" style="font-size: 0.85rem; font-weight: 600; color: white; text-decoration: none;">Hi, ${user.fullname.split(' ')[0]}</a>
+            <a href="${dashboardLink}" style="font-size: 0.85rem; font-weight: 600; color: white; text-decoration: none;">Hi, ${user.fullname.split(' ')[0]}</a>
             <a href="#" onclick="logoutUser()" class="btn btn-outline btn-sm" style="padding: 0.4rem 0.8rem; border-color: white; color: white;">Logout</a>
         `;
     }

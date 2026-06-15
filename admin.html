@@ -557,6 +557,45 @@
                     orderCustomerSelect.appendChild(opt);
                 });
             }
+
+            // Populate Recent Orders List dynamically
+            const recentOrdersList = document.getElementById('recent-orders-list');
+            if (recentOrdersList) {
+                const sortedOrders = [...orders].sort((a, b) => {
+                    const dateA = new Date(a.created_at || a.createdAt);
+                    const dateB = new Date(b.created_at || b.createdAt);
+                    return dateB - dateA;
+                }).slice(0, 5);
+
+                if (sortedOrders.length === 0) {
+                    recentOrdersList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--text-muted);">No orders placed yet.</td></tr>';
+                } else {
+                    const getStatusClass = (status) => {
+                        if (!status) return 'pending';
+                        const s = status.toLowerCase();
+                        if (s === 'paid' || s === 'completed' || s === 'approved') return 'approved';
+                        if (s === 'cancelled' || s === 'rejected') return 'rejected';
+                        return 'pending';
+                    };
+
+                    recentOrdersList.innerHTML = sortedOrders.map(o => {
+                        const customer = users.find(u => u.id === o.customer_id || u.id === o.customerId);
+                        const businessName = customer ? (customer.business_name || customer.businessName) : 'Unknown Partner';
+                        const totalAmount = parseFloat(o.total || 0).toFixed(2);
+                        const dateStr = new Date(o.created_at || o.createdAt).toLocaleDateString();
+
+                        return `
+                            <tr>
+                                <td><div class="user-info-main">#${o.id}</div></td>
+                                <td>${businessName}</td>
+                                <td>$${totalAmount}</td>
+                                <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
+                                <td>${dateStr}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -583,58 +622,6 @@
                 toggleBtn.addEventListener('click', toggleSidebar);
                 overlay.addEventListener('click', toggleSidebar);
             }
-
-            // Populate Recent Orders from Live Database
-            const recentOrdersList = document.getElementById('recent-orders-list');
-            if (!recentOrdersList) return;
-
-            let users = [];
-            let orders = [];
-
-            if (window.supabaseClient) {
-                try {
-                    const { data: u } = await window.supabaseClient.from('profiles').select('*');
-                    const { data: o } = await window.supabaseClient.from('orders').select('*').order('created_at', { ascending: false }).limit(5);
-                    users = u || [];
-                    orders = o || [];
-                } catch (err) {
-                    console.error("Error loading recent orders from DB:", err);
-                }
-            } else {
-                users = JSON.parse(localStorage.getItem('tc_users')) || [];
-                orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
-                orders = orders.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
-            }
-
-            if (orders.length === 0) {
-                recentOrdersList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--text-muted);">No orders placed yet.</td></tr>';
-                return;
-            }
-
-            const getStatusClass = (status) => {
-                if (!status) return 'pending';
-                const s = status.toLowerCase();
-                if (s === 'paid' || s === 'completed' || s === 'approved') return 'approved';
-                if (s === 'cancelled' || s === 'rejected') return 'rejected';
-                return 'pending';
-            };
-
-            recentOrdersList.innerHTML = orders.map(o => {
-                const customer = users.find(u => u.id === o.customer_id || u.id === o.customerId);
-                const businessName = customer ? (customer.business_name || customer.businessName) : 'Unknown Partner';
-                const totalAmount = parseFloat(o.total || 0).toFixed(2);
-                const dateStr = new Date(o.created_at || o.createdAt).toLocaleDateString();
-
-                return `
-                    <tr>
-                        <td><div class="user-info-main">#${o.id}</div></td>
-                        <td>${businessName}</td>
-                        <td>$${totalAmount}</td>
-                        <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
-                        <td>${dateStr}</td>
-                    </tr>
-                `;
-            }).join('');
         });
     </script>
 </body>

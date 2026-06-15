@@ -7,6 +7,25 @@ const B2B_AUTH = {
     currentUser: null,
 
     async init() {
+        // Handle "Remember Me" session checks
+        const rememberMe = localStorage.getItem('tc_remember_me') === 'true';
+        const sessionActive = sessionStorage.getItem('tc_session_active') === 'true';
+
+        if (!rememberMe && !sessionActive) {
+            // New browser session, and "Remember me" was NOT checked -> Clear session!
+            localStorage.removeItem('tc_current_user');
+            if (window.supabaseClient) {
+                try {
+                    window.supabaseClient.auth.signOut().catch(err => console.warn(err));
+                } catch (err) {
+                    console.warn("SignOut failed during session clear:", err);
+                }
+            }
+        }
+        
+        // Mark session as active for subsequent reloads in this tab
+        sessionStorage.setItem('tc_session_active', 'true');
+
         // Re-verify current session from Supabase
         if (window.supabaseClient) {
             try {
@@ -294,6 +313,8 @@ const B2B_AUTH = {
                 e.preventDefault();
                 const email = document.getElementById('email').value;
                 const pass = document.getElementById('password').value;
+                const rememberCheckbox = document.getElementById('remember');
+                const remember = rememberCheckbox ? rememberCheckbox.checked : false;
 
                 const submitBtn = loginForm.querySelector('button[type="submit"]');
                 const origText = submitBtn.innerHTML;
@@ -305,6 +326,15 @@ const B2B_AUTH = {
                 submitBtn.innerHTML = origText;
 
                 if (result.success) {
+                    // Save the remember me choice
+                    if (remember) {
+                        localStorage.setItem('tc_remember_me', 'true');
+                        localStorage.setItem('tc_remember_email', email);
+                    } else {
+                        localStorage.setItem('tc_remember_me', 'false');
+                        localStorage.removeItem('tc_remember_email');
+                    }
+
                     if (result.user.role === 'admin') {
                         window.location.href = 'admin.html';
                     } else {
@@ -340,7 +370,7 @@ const B2B_AUTH = {
         const path = window.location.pathname.split('/').pop() || 'index.html';
         
         const adminPages = ['admin.html'];
-        const portalPages = ['portal.html', 'shop.html', 'checkout.html'];
+        const portalPages = ['portal.html', 'checkout.html'];
 
         if (adminPages.includes(path)) {
             if (!user || user.role !== 'admin') {
@@ -645,8 +675,8 @@ const B2B_AUTH = {
     }
 };
 
-// Initialize
-B2B_AUTH.init();
+// Initialize on DOMContentLoaded to prevent race conditions with DOM elements and other scripts
+document.addEventListener('DOMContentLoaded', () => B2B_AUTH.init());
 
 // Global Logout hook
 window.logoutUser = () => B2B_AUTH.logout();

@@ -280,6 +280,13 @@ function updateHomepagePrices() {
     const user = JSON.parse(localStorage.getItem('tc_current_user'));
     const isApproved = user && (user.role === 'admin' || user.status === 'approved');
     
+    const skuMap = {
+        'p1': 'TC-TSH-001',
+        'p2': 'TC-SNK-002',
+        'p3': 'TC-PAN-003',
+        'p4': 'TC-ACC-004'
+    };
+
     const productPrices = {
         'p1': { price: '$29.99', name: 'Urban Essential T-Shirt' },
         'p2': { price: '$129.99', name: 'Velocity Pro Sneakers' },
@@ -287,9 +294,27 @@ function updateHomepagePrices() {
         'p4': { price: '$199.99', name: 'Premium Leather Jacket' }
     };
 
+    const loadedProducts = (typeof B2B_PRODUCTS !== 'undefined' && B2B_PRODUCTS.products) ? B2B_PRODUCTS.products : [];
+
     Object.keys(productPrices).forEach(id => {
-        const card = document.querySelector(`.product-card[data-id="${id}"]`);
+        const targetSku = skuMap[id];
+        const realProduct = loadedProducts.find(p => p.sku === targetSku);
+        
+        let card = document.querySelector(`.product-card[data-id="${id}"]`);
+        if (!card && realProduct) {
+            // If the ID was already updated to UUID, find it by the UUID
+            card = document.querySelector(`.product-card[data-id="${realProduct.id}"]`);
+        }
         if (!card) return;
+
+        if (realProduct) {
+            // Update the card's data-id to the real database UUID
+            card.setAttribute('data-id', realProduct.id);
+            
+            // Update the price dynamically from the DB value
+            productPrices[id].price = `$${parseFloat(realProduct.basePrice).toFixed(2)}`;
+            productPrices[id].name = realProduct.name;
+        }
 
         if (isApproved) {
             // Unlock: Show price and add to cart button, remove Login CTA
@@ -474,6 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isHomePage = window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/') || window.location.pathname === '';
     if (isHomePage) {
         updateHomepagePrices();
+        document.addEventListener('tc_products_loaded', updateHomepagePrices);
     }
 
     // Shop Page Specifics
@@ -571,19 +597,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Scroll Reveal Animation (Intersection Observer)
     const observerOptions = {
-        threshold: 0.1
+        threshold: 0.05,
+        rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
+                observer.unobserve(entry.target); // Stop observing once visible
             }
         });
     }, observerOptions);
 
-    document.querySelectorAll('section').forEach(section => {
-        observer.observe(section);
+    // Observe both section tags and custom .reveal-up class elements
+    const elementsToReveal = document.querySelectorAll('section, .reveal-up');
+    elementsToReveal.forEach(el => {
+        observer.observe(el);
     });
 });
 

@@ -264,6 +264,8 @@
 
             const renderCatalog = () => {
                 let products = B2B_PRODUCTS.products.filter(p => p.status === 'active');
+                const user = JSON.parse(localStorage.getItem('tc_current_user'));
+                const isApproved = user && (user.role === 'admin' || user.status === 'approved');
 
                 // 1. Filter by category
                 if (window.shopState.activeCategory !== 'all') {
@@ -304,17 +306,26 @@
                             <div class="product-img">
                                 <img src="${p.image}" alt="${p.name}">
                                 <div class="product-badge" style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-navy); color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">MOQ: ${p.moq}</div>
+                                ${isApproved ? `
                                 <button class="add-to-cart" aria-label="Add ${p.name} to cart">
                                     <i class="fa-solid fa-cart-plus"></i>
-                                </button>
+                                </button>` : ''}
                             </div>
                             <div class="product-info">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                                     <h3>${p.name}</h3>
                                     <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">SKU: ${p.sku}</span>
                                 </div>
-                                <p class="price">$${parseFloat(p.basePrice).toFixed(2)}</p>
+                                <p class="price">
+                                    ${isApproved 
+                                        ? `$${parseFloat(p.basePrice).toFixed(2)}` 
+                                        : `<span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">Login for Price</span>`
+                                    }
+                                </p>
                                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 1rem 0;">${p.description}</p>
+                                ${!isApproved ? `
+                                <a href="login.html?redirect=shop.html" class="btn btn-outline btn-sm" style="width: 100%; margin-top: 1rem; display: block; text-align: center; text-decoration: none;">Login to Order</a>
+                                ` : ''}
                             </div>
                         </div>
                     `;

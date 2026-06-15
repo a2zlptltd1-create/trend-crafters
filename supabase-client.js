@@ -1,6 +1,6 @@
 // Supabase Client Initialization for Trend Crafters
 const supabaseUrl = 'https://nvqxwonbtijraotzwqlg.supabase.co';
-const supabaseKey = 'sb_publishable_xwSvjW__FEqsGfCioYry6g_VD7w9Mwg';
+const supabaseKey = 'sb_publishable_xX_7Rg4k29XGgm1OO6e1sA_wgrgybpH';
 
 // Initialize the Supabase client
 // Note: We expect the Supabase CDN script to be loaded before this script.

@@ -62,18 +62,6 @@ CREATE TABLE IF NOT EXISTS public.orders (
 -- Enable RLS for Orders
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
--- 4. Create Order Activity Logs Table
-CREATE TABLE IF NOT EXISTS public.order_activity_logs (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    order_id TEXT REFERENCES public.orders(id) ON DELETE CASCADE,
-    action TEXT NOT NULL,
-    performed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- Enable RLS for Order Activity Logs
-ALTER TABLE public.order_activity_logs ENABLE ROW LEVEL SECURITY;
-
 -- 4. Enable RLS Policies
 
 -- Helper function to check if the current user is an admin.
@@ -128,19 +116,7 @@ CREATE POLICY "Allow users to insert their own orders" ON public.orders
 CREATE POLICY "Admins have full access to orders" ON public.orders
     ALL USING (public.is_admin());
 
--- Order Activity Logs Policies
--- Allow customers to select logs for their own orders
-CREATE POLICY "Allow users to select logs for their own orders" ON public.order_activity_logs
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM public.orders 
-            WHERE id = order_id AND (customer_id = auth.uid() OR public.is_admin())
-        )
-    );
 
--- Allow admins full access to order logs
-CREATE POLICY "Admins have full access to order logs" ON public.order_activity_logs
-    ALL USING (public.is_admin());
 
 -- 5. Trigger to handle new user registration in auth.users
 -- This automatically inserts a new profile row when a user signs up via Supabase Auth

@@ -78,6 +78,19 @@
             } else if (status === 'pending') {
                 B2B_AUTH.showStatus("Application submitted successfully! Your account is pending admin approval.", 'warning');
             }
+
+            // Pre-fill remember me details
+            const savedEmail = localStorage.getItem('tc_remember_email');
+            const rememberMe = localStorage.getItem('tc_remember_me') === 'true';
+            
+            if (savedEmail) {
+                const emailInput = document.getElementById('email');
+                if (emailInput) emailInput.value = savedEmail;
+            }
+            if (rememberMe) {
+                const rememberCheckbox = document.getElementById('remember');
+                if (rememberCheckbox) rememberCheckbox.checked = true;
+            }
         });
     </script>
 </body>

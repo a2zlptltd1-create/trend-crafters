@@ -111,8 +111,12 @@ const B2B_PRODUCTS = {
                 throw error;
             }
 
-            // Seed missing products dynamically if database has fewer than the default 7
-            if (!dbProducts || dbProducts.length < this.defaultCatalog.length) {
+            // Check if user is admin before attempting to seed database
+            const user = JSON.parse(localStorage.getItem('tc_current_user'));
+            const isAdmin = user && user.role === 'admin';
+
+            // Seed missing products dynamically if database has fewer than the default 7 AND user is admin
+            if (isAdmin && (!dbProducts || dbProducts.length < this.defaultCatalog.length)) {
                 const existingSkus = dbProducts ? dbProducts.map(p => p.sku) : [];
                 const toSeed = this.defaultCatalog.filter(p => !existingSkus.includes(p.sku));
                 

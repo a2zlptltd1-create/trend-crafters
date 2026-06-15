@@ -40,7 +40,7 @@
         <main class="main-content">
             <!-- Mock Admin Warning Banner (Dynamically shown) -->
             <div id="mock-admin-warning" class="banner banner-warning" style="display: none; padding: 1.2rem; background: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 8px; margin-bottom: 2rem; font-size: 0.88rem; line-height: 1.5;">
-                <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem; color: #c5a059;"></i> 
+                <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem; color: var(--accent-gold);"></i> 
                 <strong>Mock Session Active:</strong> You are logged in with offline mock admin credentials. Database write actions (approving users, updating order status, deleting products) will be rejected by Supabase RLS policies. To write to the live database, create a user in Supabase Auth, change their role to <code>admin</code> in the profiles table, and login.
             </div>
 
@@ -449,7 +449,17 @@
                         </div>
                         <div class="form-group">
                             <label>Country</label>
-                            <input type="text" id="edit-c-country" class="form-control" required>
+                            <select id="edit-c-country" class="form-control" required>
+                                <option value="United States">United States</option>
+                                <option value="Canada">Canada</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Australia">Australia</option>
+                                <option value="Germany">Germany</option>
+                                <option value="France">France</option>
+                                <option value="United Arab Emirates">United Arab Emirates</option>
+                                <option value="Pakistan">Pakistan</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
                     <div style="text-align: right; margin-top: 1rem; display: flex; gap: 1rem; justify-content: flex-end;">

@@ -140,6 +140,44 @@
     <script src="orders.js"></script>
     <script src="script.js"></script>
     <script>
+        // B2B Custom Invoice Payment Redirect Handler
+        async function handlePaymentClick(orderId, paymentLink, openInNewTab) {
+            const btn = document.getElementById('payment-btn');
+            if (btn) {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Redirecting...';
+                btn.style.pointerEvents = 'none';
+                btn.style.opacity = '0.7';
+            }
+
+            // Update status to Pending in Supabase or LocalStorage
+            if (window.supabaseClient) {
+                try {
+                    await window.supabaseClient
+                        .from('orders')
+                        .update({ status: 'Pending' })
+                        .eq('id', orderId);
+                } catch (err) {
+                    console.error("Failed to update status to Pending:", err);
+                }
+            } else {
+                const orders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    order.status = 'Pending';
+                    localStorage.setItem('tc_generated_orders', JSON.stringify(orders));
+                }
+            }
+
+            alert("Redirecting to the secure payment page. Once payment is completed, the admin will verify and process your order.");
+
+            if (openInNewTab) {
+                window.open(paymentLink, '_blank');
+                setTimeout(() => location.reload(), 1000); // reload to show Pending state
+            } else {
+                window.location.href = paymentLink;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('orderId');
@@ -315,6 +353,41 @@
             totalsGrid.style.borderRadius = '12px';
             totalsGrid.style.marginTop = '1.5rem';
 
+            // Add status message blocks depending on order state
+            const isProcessing = order.status === 'Pending' || order.status === 'Processing';
+            const isPaid = order.status === 'Paid' || order.status === 'Completed';
+
+            let paymentActionHtml = '';
+            if (isPaid) {
+                paymentActionHtml = `
+                    <div style="margin-top: 2rem; background: #e6f4ea; border: 1px solid #34a853; padding: 1.5rem; border-radius: 8px; text-align: center; color: #137333;">
+                        <h4 style="margin-bottom: 0.5rem;"><i class="fa-solid fa-circle-check"></i> Order Paid & Confirmed</h4>
+                        <p style="font-size: 0.85rem;">This invoice has been completed. Our logistics team is preparing your cargo.</p>
+                    </div>
+                `;
+            } else if (isProcessing) {
+                paymentActionHtml = `
+                    <div style="margin-top: 2.5rem; background: #fef7e0; border-left: 4px solid #f9ab00; padding: 1.5rem; border-radius: 8px; color: #b06000; margin-bottom: 1.5rem;">
+                        <h4 style="margin-bottom: 0.5rem; font-size: 0.95rem;"><i class="fa-solid fa-clock"></i> Verification In Progress</h4>
+                        <p style="font-size: 0.85rem; line-height: 1.5; color: #6b7280; margin-bottom: 1rem;">We are validating your transaction. If you haven't paid yet or need to retry, use the button below.</p>
+                    </div>
+                    <button id="payment-btn" onclick="handlePaymentClick('${order.id}', '${order.paymentLink}', ${order.openInNewTab})" class="btn btn-primary" style="width: 100%; font-size: 1.2rem; padding: 1.5rem; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2); text-transform: uppercase; letter-spacing: 1px; display: block; text-align: center; border-radius: 8px;">
+                        Retry Payment / View Link
+                    </button>
+                `;
+            } else {
+                paymentActionHtml = `
+                    <div style="margin-top: 2rem;">
+                        <button id="payment-btn" onclick="handlePaymentClick('${order.id}', '${order.paymentLink}', ${order.openInNewTab})" class="btn btn-primary" style="width: 100%; font-size: 1.2rem; padding: 1.5rem; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2); text-transform: uppercase; letter-spacing: 1px; display: block; text-align: center; border-radius: 8px;">
+                            ${order.buttonText} <i class="fa-solid fa-arrow-right" style="margin-left: 0.8rem;"></i>
+                        </button>
+                        <p style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+                            <i class="fa-solid fa-shield-halved"></i> Secure Enterprise-Grade Payment Gateway
+                        </p>
+                    </div>
+                `;
+            }
+
             totalsGrid.innerHTML = `
                 <div class="summary-row" style="margin-bottom: 0.8rem;">
                     <span style="color: var(--text-muted);">Bulk Subtotal</span>
@@ -344,14 +417,7 @@
                     <span style="font-size: 1.5rem; font-weight: 900; color: var(--accent-gold);">$${parseFloat(order.total).toFixed(2)}</span>
                 </div>
                 
-                <div style="margin-top: 2rem;">
-                    <a href="${order.paymentLink}" ${order.openInNewTab ? 'target="_blank"' : ''} class="btn btn-primary" style="width: 100%; font-size: 1.2rem; padding: 1.5rem; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2); text-transform: uppercase; letter-spacing: 1px; display: block; text-align: center; border-radius: 8px;">
-                        ${order.buttonText} <i class="fa-solid fa-arrow-right" style="margin-left: 0.8rem;"></i>
-                    </a>
-                    <p style="text-align: center; margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
-                        <i class="fa-solid fa-shield-halved"></i> Secure Enterprise-Grade Payment Gateway
-                    </p>
-                </div>
+                ${paymentActionHtml}
             `;
         }
     </script>

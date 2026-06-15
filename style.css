@@ -7,10 +7,10 @@
     --bg-primary: #f8fafc;
     --bg-secondary: #ffffff;
     --white: #ffffff;          /* Standard White */
-    --accent-navy: #0f172a;    /* Deep Enterprise Navy */
-    --accent-gold: #c5a059;    /* Refined Metallic Gold */
-    --accent-gold-light: #d4bc8d;
-    --accent-yellow: #c5a059;  /* Alias for legacy gold references */
+    --accent-navy: #0B4D70;    /* Midnight Navy */
+    --accent-gold: #F8BF02;    /* Signature Yellow */
+    --accent-gold-light: #fce588;
+    --accent-yellow: #F8BF02;  /* Alias for legacy references */
     --accent-sage: #86a397;    /* Sophisticated Theme Sage Green */
     --text-white: #ffffff;
     --text-dark: #1e293b;      /* Slate 800 */
@@ -698,10 +698,16 @@ body {
 
 /* Section Common */
 section {
-    padding: 8rem 0;
+    padding: 10rem 0;
     opacity: 1; /* Changed to visible by default to prevent white pages */
     transform: translateY(0);
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+    section {
+        padding: 6rem 0;
+    }
 }
 
 section.reveal {
@@ -717,6 +723,18 @@ section.reveal.visible {
 section.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Scroll Reveal Utility */
+.reveal-up {
+    opacity: 0 !important;
+    transform: translateY(30px) !important;
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.reveal-up.visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
 }
 
 /* Staggered Children Animation */
@@ -923,7 +941,7 @@ section.visible .product-card:nth-child(4) { animation-delay: 0.4s; }
 }
 
 .category-card:hover::before {
-    background: linear-gradient(to top, rgba(140, 166, 140, 0.6), transparent);
+    background: linear-gradient(to top, rgba(11, 77, 112, 0.7), transparent);
 }
 
 .card-content {

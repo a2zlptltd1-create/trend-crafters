@@ -25,30 +25,41 @@ const B2B_ORDERS = {
         try {
             const { data, error } = await window.supabaseClient
                 .from('orders')
-                .select('*');
+                .select('*, order_items(*)');
 
             if (error) throw error;
 
-            this.orders = (data || []).map(o => ({
-                id: o.id,
-                customerId: o.customer_id,
-                productId: o.product_id,
-                quantity: o.quantity,
-                unitPrice: parseFloat(o.unit_price),
-                subtotal: parseFloat(o.subtotal),
-                tax: parseFloat(o.tax),
-                taxAmount: parseFloat(o.tax_amount),
-                shipping: parseFloat(o.shipping),
-                discount: parseFloat(o.discount),
-                total: parseFloat(o.total),
-                paymentLink: o.payment_link,
-                buttonText: o.button_text,
-                openInNewTab: o.open_in_new_tab,
-                notes: o.notes,
-                status: o.status,
-                createdAt: o.created_at,
-                checkoutUrl: `checkout.html?orderId=${o.id}`
-            }));
+            this.orders = (data || []).map(o => {
+                const firstItem = (o.order_items && o.order_items.length > 0) ? o.order_items[0] : null;
+                return {
+                    id: o.id,
+                    customerId: o.customer_id,
+                    subtotal: parseFloat(o.subtotal),
+                    tax: parseFloat(o.tax),
+                    taxAmount: parseFloat(o.tax_amount),
+                    shipping: parseFloat(o.shipping),
+                    discount: parseFloat(o.discount),
+                    total: parseFloat(o.total),
+                    paymentLink: o.payment_link,
+                    buttonText: o.button_text,
+                    openInNewTab: o.open_in_new_tab,
+                    notes: o.notes,
+                    status: o.status,
+                    createdAt: o.created_at,
+                    checkoutUrl: `checkout.html?orderId=${o.id}`,
+                    // Fallback top level fields for compatibility
+                    productId: firstItem ? firstItem.product_id : undefined,
+                    quantity: firstItem ? firstItem.quantity : undefined,
+                    unitPrice: firstItem ? parseFloat(firstItem.unit_price) : undefined,
+                    items: (o.order_items || []).map(item => ({
+                        id: item.id,
+                        productId: item.product_id,
+                        quantity: item.quantity,
+                        unitPrice: parseFloat(item.unit_price),
+                        subtotal: parseFloat(item.subtotal)
+                    }))
+                };
+            });
 
             this.saveLocalCache();
         } catch (err) {
@@ -68,9 +79,6 @@ const B2B_ORDERS = {
         const newOrder = {
             id: orderId,
             customerId: orderData.customerId,
-            productId: orderData.productId,
-            quantity: orderData.quantity,
-            unitPrice: orderData.unitPrice,
             subtotal,
             tax: orderData.tax,
             taxAmount,
@@ -83,7 +91,17 @@ const B2B_ORDERS = {
             notes: orderData.notes,
             status: 'Generated',
             createdAt: new Date().toISOString(),
-            checkoutUrl: `checkout.html?orderId=${orderId}`
+            checkoutUrl: `checkout.html?orderId=${orderId}`,
+            // Fallback top level fields for compatibility
+            productId: orderData.productId,
+            quantity: orderData.quantity,
+            unitPrice: orderData.unitPrice,
+            items: [{
+                productId: orderData.productId,
+                quantity: orderData.quantity,
+                unitPrice: orderData.unitPrice,
+                subtotal
+            }]
         };
 
         if (!window.supabaseClient) {
@@ -100,9 +118,6 @@ const B2B_ORDERS = {
             const dbOrder = {
                 id: orderId,
                 customer_id: orderData.customerId,
-                product_id: orderData.productId,
-                quantity: orderData.quantity,
-                unit_price: orderData.unitPrice,
                 subtotal,
                 tax: orderData.tax,
                 tax_amount: taxAmount,
@@ -123,6 +138,23 @@ const B2B_ORDERS = {
             if (error) {
                 showToast(error.message, 'error');
                 return null;
+            }
+
+            // Insert single product item into order_items
+            const dbOrderItem = {
+                order_id: orderId,
+                product_id: orderData.productId,
+                quantity: orderData.quantity,
+                unit_price: orderData.unitPrice,
+                subtotal
+            };
+
+            const { error: itemErr } = await window.supabaseClient
+                .from('order_items')
+                .insert([dbOrderItem]);
+
+            if (itemErr) {
+                console.error("Error inserting custom order item:", itemErr);
             }
 
             await this.loadOrders();
@@ -157,10 +189,12 @@ const B2B_ORDERS = {
         if (!order) return;
 
         let customer, product;
+        const mainProductId = (order.items && order.items.length > 0) ? order.items[0].productId : order.productId;
+
         if (window.supabaseClient) {
             try {
                 const { data: cust } = await window.supabaseClient.from('profiles').select('*').eq('id', order.customerId).single();
-                const { data: prod } = await window.supabaseClient.from('products').select('*').eq('id', order.productId).single();
+                const { data: prod } = await window.supabaseClient.from('products').select('*').eq('id', mainProductId).single();
                 customer = cust;
                 product = prod;
             } catch (err) {
@@ -168,7 +202,7 @@ const B2B_ORDERS = {
             }
         } else {
             customer = (JSON.parse(localStorage.getItem('tc_users')) || []).find(u => u.id === order.customerId);
-            product = (JSON.parse(localStorage.getItem('tc_products')) || []).find(p => p.id === order.productId);
+            product = (JSON.parse(localStorage.getItem('tc_products')) || []).find(p => p.id === mainProductId);
         }
 
         if (customer && typeof B2B_NOTIFY !== 'undefined') {
@@ -406,11 +440,34 @@ const B2B_ORDERS = {
 
             list.innerHTML = this.orders.map(o => {
                 const customer = users.find(u => u.id === o.customerId || u.id === o.customer_id);
-                const product = products.find(p => p.id === o.productId || p.id === o.product_id);
-                
                 const businessName = customer ? (customer.business_name || customer.businessName) : 'Unknown';
                 const fullname = customer ? customer.fullname : '';
-                const productName = product ? product.name : 'Custom Item';
+
+                // Get all items in the order
+                let itemsHtml = '';
+                if (o.items && o.items.length > 0) {
+                    itemsHtml = o.items.map((item, idx) => {
+                        const product = products.find(p => p.id === item.productId || p.id === item.product_id);
+                        const productName = product ? product.name : 'Custom Item';
+                        const isLast = idx === o.items.length - 1;
+                        return `
+                            <div style="margin-bottom: 0.3rem; ${isLast ? '' : 'border-bottom: 1px dashed #e2e8f0; padding-bottom: 0.3rem;'}">
+                                <div class="user-info-main" style="font-size: 0.85rem;">${productName}</div>
+                                <div class="user-info-sub" style="font-size: 0.75rem;">Qty: ${item.quantity} @ $${parseFloat(item.unitPrice).toFixed(2)}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    // Fallback to legacy single product fields if items list is empty
+                    const product = products.find(p => p.id === o.productId || p.id === o.product_id);
+                    const productName = product ? product.name : 'Custom Item';
+                    itemsHtml = `
+                        <div>
+                            <div class="user-info-main" style="font-size: 0.85rem;">${productName}</div>
+                            <div class="user-info-sub" style="font-size: 0.75rem;">Qty: ${o.quantity || 0} @ $${parseFloat(o.unitPrice || 0).toFixed(2)}</div>
+                        </div>
+                    `;
+                }
 
                 const baseUrl = window.location.href.split('/').slice(0, -1).join('/');
                 const copyCheckoutLink = `${baseUrl}/${o.checkoutUrl}`;
@@ -426,8 +483,7 @@ const B2B_ORDERS = {
                             <div class="user-info-sub">${fullname}</div>
                         </td>
                         <td>
-                            <div class="user-info-main">${productName}</div>
-                            <div class="user-info-sub">Qty: ${o.quantity} @ $${parseFloat(o.unitPrice).toFixed(2)}</div>
+                            ${itemsHtml}
                         </td>
                         <td>
                             <div class="user-info-main">$${parseFloat(o.total).toFixed(2)}</div>

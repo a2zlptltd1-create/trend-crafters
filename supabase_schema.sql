@@ -41,9 +41,6 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 CREATE TABLE IF NOT EXISTS public.orders (
     id TEXT PRIMARY KEY, -- Custom B2B order ID (e.g. ORD-1234)
     customer_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-    product_id UUID REFERENCES public.products(id) ON DELETE SET NULL,
-    quantity INTEGER NOT NULL,
-    unit_price DECIMAL(10, 2) NOT NULL,
     subtotal DECIMAL(10, 2) NOT NULL,
     tax DECIMAL(5, 2) DEFAULT 0 NOT NULL,
     tax_amount DECIMAL(10, 2) DEFAULT 0 NOT NULL,
@@ -61,6 +58,20 @@ CREATE TABLE IF NOT EXISTS public.orders (
 
 -- Enable RLS for Orders
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+
+-- 3b. Create Order Items Table
+CREATE TABLE IF NOT EXISTS public.order_items (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    order_id TEXT REFERENCES public.orders(id) ON DELETE CASCADE,
+    product_id UUID REFERENCES public.products(id) ON DELETE SET NULL,
+    quantity INTEGER NOT NULL,
+    unit_price DECIMAL(10, 2) NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Order Items
+ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
 -- 4. Enable RLS Policies
 
@@ -114,6 +125,29 @@ CREATE POLICY "Allow users to insert their own orders" ON public.orders
 
 -- Allow admins to do everything on orders
 CREATE POLICY "Admins have full access to orders" ON public.orders
+    ALL USING (public.is_admin());
+
+-- Order Items Policies:
+-- Allow select access only to the user themselves or to authorized admins
+CREATE POLICY "Allow select access to own order items or admins" ON public.order_items
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.orders
+            WHERE orders.id = order_items.order_id AND (orders.customer_id = auth.uid() OR public.is_admin())
+        )
+    );
+
+-- Allow users to insert their own order items
+CREATE POLICY "Allow users to insert own order items" ON public.order_items
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.orders
+            WHERE orders.id = order_items.order_id AND orders.customer_id = auth.uid()
+        )
+    );
+
+-- Allow admins to do everything on order items
+CREATE POLICY "Admins have full access to order items" ON public.order_items
     ALL USING (public.is_admin());
 
 

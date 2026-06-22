@@ -1,5 +1,5 @@
 // Supabase Client Initialization for Trend Crafters
-const supabaseUrl = 'https://nvqxwonbtijraotzwqlg.supabase.co';
+const supabaseUrl = 'https://pdpcwmtnqwyineqcysca.supabase.co';
 const supabaseKey = 'sb_publishable_xX_7Rg4k29XGgm1OO6e1sA_wgrgybpH';
 
 // Initialize the Supabase client

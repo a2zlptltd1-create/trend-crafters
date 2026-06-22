@@ -204,32 +204,42 @@
                 try {
                     const { data: ords } = await window.supabaseClient
                         .from('orders')
-                        .select('*')
+                        .select('*, order_items(*)')
                         .eq('customer_id', userId);
                     
                     const { data: prods } = await window.supabaseClient
                         .from('products')
                         .select('*');
                     
-                    myOrders = (ords || []).map(o => ({
-                        id: o.id,
-                        customerId: o.customer_id,
-                        productId: o.product_id,
-                        quantity: o.quantity,
-                        unitPrice: parseFloat(o.unit_price),
-                        subtotal: parseFloat(o.subtotal),
-                        tax: parseFloat(o.tax),
-                        taxAmount: parseFloat(o.tax_amount),
-                        shipping: parseFloat(o.shipping),
-                        discount: parseFloat(o.discount),
-                        total: parseFloat(o.total),
-                        paymentLink: o.payment_link,
-                        buttonText: o.button_text,
-                        notes: o.notes,
-                        status: o.status,
-                        createdAt: o.created_at,
-                        checkoutUrl: `checkout.html?orderId=${o.id}`
-                    }));
+                    myOrders = (ords || []).map(o => {
+                        const firstItem = (o.order_items && o.order_items.length > 0) ? o.order_items[0] : null;
+                        return {
+                            id: o.id,
+                            customerId: o.customer_id,
+                            subtotal: parseFloat(o.subtotal),
+                            tax: parseFloat(o.tax),
+                            taxAmount: parseFloat(o.tax_amount),
+                            shipping: parseFloat(o.shipping),
+                            discount: parseFloat(o.discount),
+                            total: parseFloat(o.total),
+                            paymentLink: o.payment_link,
+                            buttonText: o.button_text,
+                            notes: o.notes,
+                            status: o.status,
+                            createdAt: o.created_at,
+                            checkoutUrl: `checkout.html?orderId=${o.id}`,
+                            // Fallback top level fields for compatibility
+                            productId: firstItem ? firstItem.product_id : undefined,
+                            quantity: firstItem ? firstItem.quantity : undefined,
+                            unitPrice: firstItem ? parseFloat(firstItem.unit_price) : undefined,
+                            items: (o.order_items || []).map(item => ({
+                                productId: item.product_id,
+                                quantity: item.quantity,
+                                unitPrice: parseFloat(item.unit_price),
+                                subtotal: parseFloat(item.subtotal)
+                            }))
+                        };
+                    });
 
                     products = (prods || []).map(p => ({
                         id: p.id,
@@ -247,7 +257,7 @@
                 }
             } else {
                 const allOrders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
-                myOrders = allOrders.filter(o => o.customerId === userId);
+                myOrders = allOrders.filter(o => o.customerId === userId || o.customer_id === userId);
                 products = JSON.parse(localStorage.getItem('tc_products')) || [];
             }
 
@@ -278,10 +288,21 @@
             };
 
             const getHtml = (o) => {
-                const p = products.find(prod => prod.id === o.productId);
                 const s = o.status ? o.status.toLowerCase() : '';
                 const canPay = s !== 'paid' && s !== 'completed' && s !== 'cancelled';
                 
+                // Get display name for product(s)
+                let productNames = 'Custom Items';
+                if (o.items && o.items.length > 0) {
+                    productNames = o.items.map(item => {
+                        const p = products.find(prod => prod.id === item.productId || prod.id === item.product_id);
+                        return p ? p.name : 'Custom Item';
+                    }).join(', ');
+                } else if (o.productId) {
+                    const p = products.find(prod => prod.id === o.productId);
+                    if (p) productNames = p.name;
+                }
+
                 const actionCell = canPay 
                     ? `<a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Complete Payment</a>`
                     : `<span style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-lock" style="margin-right: 0.3rem;"></i> Locked</span>`;
@@ -289,7 +310,7 @@
                 return `
                     <tr>
                         <td><div class="user-info-main">#${o.id}</div></td>
-                        <td>${p ? p.name : 'Custom Package'}</td>
+                        <td>${productNames}</td>
                         <td>$${parseFloat(o.total).toFixed(2)}</td>
                         <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
                         <td>${actionCell}</td>
@@ -298,9 +319,25 @@
             };
 
             const getFullHtml = (o) => {
-                const p = products.find(prod => prod.id === o.productId);
                 const s = o.status ? o.status.toLowerCase() : '';
                 const canPay = s !== 'paid' && s !== 'completed' && s !== 'cancelled';
+
+                // Get details of products list
+                let itemsDetailHtml = '';
+                let totalQty = 0;
+                if (o.items && o.items.length > 0) {
+                    itemsDetailHtml = o.items.map(item => {
+                        const p = products.find(prod => prod.id === item.productId || prod.id === item.product_id);
+                        const productName = p ? p.name : 'Custom Item';
+                        totalQty += item.quantity;
+                        return `${productName} (${item.quantity} units)`;
+                    }).join('<br>');
+                } else {
+                    const p = products.find(prod => prod.id === o.productId || prod.id === o.product_id);
+                    const productName = p ? p.name : 'Custom Item';
+                    totalQty = o.quantity || 0;
+                    itemsDetailHtml = `${productName} (${totalQty} units)`;
+                }
 
                 const actionCell = canPay 
                     ? `<a href="checkout.html?orderId=${o.id}" class="btn btn-primary btn-sm">Pay Now</a>`
@@ -310,8 +347,8 @@
                     <tr>
                         <td>${new Date(o.createdAt).toLocaleDateString()}</td>
                         <td><div class="user-info-main">#${o.id}</div></td>
-                        <td>${p ? p.name : 'Custom Item'}</td>
-                        <td>${o.quantity} units</td>
+                        <td style="font-size: 0.85rem; line-height: 1.4;">${itemsDetailHtml}</td>
+                        <td>${totalQty} units</td>
                         <td style="font-weight: 700;">$${parseFloat(o.total).toFixed(2)}</td>
                         <td><span class="badge badge-${getStatusClass(o.status)}">${o.status}</span></td>
                         <td>${actionCell}</td>

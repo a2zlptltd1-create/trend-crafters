@@ -428,32 +428,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const syncCartToSupabase = async () => {
                 const user = JSON.parse(localStorage.getItem('tc_current_user'));
-                // Skip Supabase syncing if the user is the mock admin 'admin-001' (not a valid UUID)
+                const orderId = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                const subtotal = cart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+                const products = (typeof B2B_PRODUCTS !== 'undefined' ? B2B_PRODUCTS.products : []) || [];
+
+                // 1. Save local offline backup first
+                const localOrder = {
+                    id: orderId,
+                    customerId: user ? user.id : 'guest',
+                    subtotal: subtotal,
+                    total: subtotal,
+                    status: 'Pending',
+                    createdAt: new Date().toISOString(),
+                    checkoutUrl: `checkout.html?orderId=${orderId}`,
+                    items: cart.map(item => {
+                        const matchedProd = products.find(p => p.id === item.id || p.name === item.name || p.sku === item.id);
+                        return {
+                            productId: matchedProd ? matchedProd.id : item.id,
+                            quantity: item.quantity,
+                            unitPrice: item.price,
+                            subtotal: item.quantity * item.price
+                        };
+                    })
+                };
+                const localOrders = JSON.parse(localStorage.getItem('tc_generated_orders')) || [];
+                localOrders.push(localOrder);
+                localStorage.setItem('tc_generated_orders', JSON.stringify(localOrders));
+
+                // 2. Sync to Supabase if available
                 if (window.supabaseClient && user && user.id !== 'admin-001') {
                     try {
-                        const products = (typeof B2B_PRODUCTS !== 'undefined' ? B2B_PRODUCTS.products : []) || [];
-                        for (const item of cart) {
-                            // Match default item IDs or names to get UUID
+                        const dbOrder = {
+                            id: orderId,
+                            customer_id: user.id,
+                            subtotal: subtotal,
+                            total: subtotal,
+                            status: 'Pending',
+                            button_text: 'Pay Now',
+                            open_in_new_tab: true
+                        };
+
+                        const { error: orderErr } = await window.supabaseClient.from('orders').insert([dbOrder]);
+                        if (orderErr) throw orderErr;
+
+                        const dbOrderItems = cart.map(item => {
                             const matchedProd = products.find(p => p.id === item.id || p.name === item.name || p.sku === item.id);
                             const prodId = matchedProd ? matchedProd.id : null;
-
-                            const orderId = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-                            const subtotal = item.quantity * item.price;
-
-                            const dbOrder = {
-                                id: orderId,
-                                customer_id: user.id,
+                            return {
+                                order_id: orderId,
                                 product_id: prodId,
                                 quantity: item.quantity,
                                 unit_price: item.price,
-                                subtotal: subtotal,
-                                total: subtotal,
-                                status: 'Pending',
-                                button_text: 'Pay Now'
+                                subtotal: item.quantity * item.price
                             };
+                        });
 
-                            await window.supabaseClient.from('orders').insert([dbOrder]);
-                        }
+                        const { error: itemsErr } = await window.supabaseClient.from('order_items').insert(dbOrderItems);
+                        if (itemsErr) throw itemsErr;
                     } catch (dbErr) {
                         console.error("Failed to sync checkout cart items to Supabase:", dbErr);
                     }

@@ -70,13 +70,15 @@ const B2B_NOTIFY = {
     onOrderGenerated(order, customer, product) {
         const baseUrl = window.location.href.split('/').slice(0, -1).join('/');
         const link = `${baseUrl}/${order.checkoutUrl}`;
+        // Extract quantity from order items array, fallback to top level property if available
+        const qty = (order.items && order.items.length > 0) ? order.items[0].quantity : (order.quantity || 0);
         const body = `
             Hi ${customer.fullname},
             
             Your custom wholesale order for ${product ? product.name : 'Selection'} has been generated.
             
             Order ID: #${order.id}
-            Quantity: ${order.quantity} units
+            Quantity: ${qty} units
             Total Amount: $${parseFloat(order.total).toFixed(2)}
             
             Complete your payment here: ${link}

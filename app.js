@@ -1,4 +1,11 @@
-// app.js — Mobile navigation + Live search handlers
+// app.js — Mobile navigation + Live search handlers + WhatsApp Integration
+
+// === WhatsApp Configuration ===
+window.WHATSAPP_CONFIG = {
+    merchantPhone: '+923001234567', // Default: Pakistani number, customize as needed
+    setPhone(phone) { this.merchantPhone = phone; }
+};
+
 (function(){
     // Toggle mobile navigation drawer
     function toggleMobileNav(open) {

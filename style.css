@@ -114,6 +114,38 @@ body {
     color: white;
 }
 
+/* WhatsApp Button Styling */
+.btn-whatsapp {
+    background: #25D366 !important;
+    color: white !important;
+    border: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-whatsapp:hover {
+    background: #1fb456 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
+    text-decoration: none;
+    color: white !important;
+}
+
+.btn-whatsapp:active {
+    transform: translateY(0);
+    box-shadow: 0 0 10px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp i {
+    font-size: 1.2rem;
+}
+
 /* Auth & Admin Cards */
 .auth-card {
     background: var(--bg-secondary);

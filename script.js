@@ -1,6 +1,9 @@
 // --- CONFIG & STATE ---
 let cart = JSON.parse(localStorage.getItem('trendCraftersCart')) || [];
 
+// WhatsApp Order Tracking
+let lastOrderDetails = null;
+
 // --- UTILS: TOAST SYSTEM ---
 // Remotely managed in auth.js to be globally accessible on all pages.
 
@@ -60,6 +63,46 @@ function openCart() {
 
 function closeCart() {
     document.querySelectorAll('.cart-sidebar, .cart-overlay').forEach(el => el.classList.remove('active'));
+}
+
+// Function to generate WhatsApp link with order details
+function generateWhatsAppLink(orderDetails) {
+    if (!orderDetails) return null;
+    
+    const merchantPhone = window.WHATSAPP_CONFIG?.merchantPhone || '+923001234567';
+    
+    // Format order message
+    let message = `*Order Confirmation Request*\n\n`;
+    message += `Order ID: ${orderDetails.orderId}\n`;
+    message += `Customer: ${orderDetails.customerName || 'Guest'}\n`;
+    message += `Address: ${orderDetails.address || 'N/A'}\n\n`;
+    
+    message += `*Products:*\n`;
+    if (orderDetails.items && Array.isArray(orderDetails.items)) {
+        orderDetails.items.forEach(item => {
+            message += `• ${item.name}\n  Qty: ${item.quantity} × $${item.price.toFixed(2)}\n`;
+        });
+    }
+    
+    message += `\n*Order Total: $${orderDetails.total.toFixed(2)}*\n`;
+    message += `\nPlease confirm this order. Thank you!`;
+    
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+    return `https://wa.me/${merchantPhone.replace(/[^0-9+]/g, '')}?text=${encodedMessage}`;
+}
+
+// Function to set WhatsApp button when success modal appears
+function setWhatsAppButton(orderDetails) {
+    lastOrderDetails = orderDetails;
+    const whatsappBtn = document.getElementById('whatsapp-confirm-btn');
+    if (whatsappBtn && orderDetails) {
+        const link = generateWhatsAppLink(orderDetails);
+        if (link) {
+            whatsappBtn.href = link;
+            whatsappBtn.style.display = 'inline-flex';
+        }
+    }
 }
 
 window.addToCart = function(id, name, price, image, moq = 1) {
@@ -459,6 +502,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const subtotal = cart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
                 const products = (typeof B2B_PRODUCTS !== 'undefined' ? B2B_PRODUCTS.products : []) || [];
 
+                // Store order details for WhatsApp
+                const orderDetails = {
+                    orderId: orderId,
+                    customerName: user?.name || document.querySelector('input[name="full_name"]')?.value || 'Customer',
+                    address: document.querySelector('input[name="address"]')?.value || 'N/A',
+                    items: cart.map(item => ({
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.price
+                    })),
+                    subtotal: subtotal,
+                    total: subtotal
+                };
+
                 // 1. Save local offline backup first
                 const localOrder = {
                     id: orderId,
@@ -516,12 +573,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.error("Failed to sync checkout cart items to Supabase:", dbErr);
                     }
                 }
+                
+                // Return order details for WhatsApp button setup
+                return orderDetails;
             };
 
             handleFormSubmit(form, async () => {
-                await syncCartToSupabase();
+                const orderDetails = await syncCartToSupabase();
                 const modal = document.getElementById('success-modal');
                 if (modal) modal.classList.add('active');
+                // Set up WhatsApp button with order details
+                if (orderDetails) {
+                    setWhatsAppButton(orderDetails);
+                }
                 cart = [];
                 updateCartUI();
                 localStorage.removeItem('trendCraftersCart');

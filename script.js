@@ -63,20 +63,28 @@ function closeCart() {
 }
 
 window.addToCart = function(id, name, price, image, moq = 1) {
-    const priceNum = typeof price === 'string' ? parseFloat(price.replace('$', '')) : price;
+    const priceNum = typeof price === 'string'
+        ? parseFloat(price.replace(/[^0-9.-]+/g, ''))
+        : Number(price);
+    const toastFn = typeof showToast === 'function' ? showToast : (msg, type = 'success') => console[type === 'error' ? 'error' : 'log'](msg);
+
+    if (Number.isNaN(priceNum) || priceNum <= 0) {
+        toastFn('Price unavailable. Please login to view wholesale pricing.', 'error');
+        return;
+    }
+
     const existingItem = cart.find(item => item.id === id);
-    
+
     // Check MOQ if not already in cart
     if (!existingItem && moq > 1) {
-        // Option A: Just set quantity to MOQ
         cart.push({ id, name, price: priceNum, image, quantity: parseInt(moq) });
-        showToast(`${name} added to cart! (Minimum Order Quantity: ${moq})`);
+        toastFn(`${name} added to cart! (Minimum Order Quantity: ${moq})`);
     } else if (existingItem) {
         existingItem.quantity += 1;
-        showToast(`${name} quantity updated!`);
+        toastFn(`${name} quantity updated!`);
     } else {
         cart.push({ id, name, price: priceNum, image, quantity: 1 });
-        showToast(`${name} added to cart!`);
+        toastFn(`${name} added to cart!`);
     }
     
     updateCartUI();
@@ -96,8 +104,10 @@ window.removeFromCart = function(id) {
 // --- FORM HANDLING ---
 async function handleFormSubmit(form, successCallback) {
     const formData = new FormData(form);
-    const object = Object.fromEntries(formData);
-    const json = JSON.stringify(object);
+    const endpoint = form.getAttribute('action') || 'https://api.web3forms.com/submit';
+    const method = (form.getAttribute('method') || 'POST').toUpperCase();
+    const isJsonSubmit = form.dataset.json === 'true';
+    const toastFn = typeof showToast === 'function' ? showToast : (msg, type = 'success') => console[type === 'error' ? 'error' : 'log'](msg);
 
     const submitBtn = form.querySelector('button[type="submit"]');
     if (!submitBtn) return;
@@ -107,22 +117,39 @@ async function handleFormSubmit(form, successCallback) {
     submitBtn.disabled = true;
 
     try {
-        const response = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: json
-        });
+        let requestOptions = { method, headers: {}, body: null };
+        let requestUrl = endpoint;
 
-        const result = await response.json();
+        if (method === 'GET') {
+            const params = new URLSearchParams(formData);
+            requestUrl = `${endpoint}?${params.toString()}`;
+        } else if (isJsonSubmit) {
+            const object = Object.fromEntries(formData);
+            requestOptions.headers['Content-Type'] = 'application/json';
+            requestOptions.headers['Accept'] = 'application/json';
+            requestOptions.body = JSON.stringify(object);
+        } else {
+            requestOptions.body = formData;
+        }
 
-        if (response.status === 200) {
+        const response = await fetch(requestUrl, requestOptions);
+        let result;
+
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+            result = await response.json();
+        } else {
+            result = await response.text();
+        }
+
+        if (response.ok) {
             if (successCallback) successCallback(result, form);
         } else {
-            showToast(result.message || "Something went wrong!", "error");
+            toastFn((result && result.message) || "Something went wrong!", "error");
         }
     } catch (error) {
         console.error(error);
-        showToast("Submission failed. Please check your connection.", "error");
+        toastFn("Submission failed. Please check your connection.", "error");
     } finally {
         submitBtn.innerHTML = originalBtnText;
         submitBtn.disabled = false;

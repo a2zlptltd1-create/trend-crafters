@@ -7,37 +7,25 @@ const B2B_AUTH = {
     currentUser: null,
 
     async init() {
-        // Handle "Remember Me" session checks
         const rememberMe = localStorage.getItem('tc_remember_me') === 'true';
         const sessionActive = sessionStorage.getItem('tc_session_active') === 'true';
+        const storedUser = JSON.parse(localStorage.getItem('tc_current_user'));
 
-        if (!rememberMe && !sessionActive) {
-            // New browser session, and "Remember me" was NOT checked -> Clear session!
-            localStorage.removeItem('tc_current_user');
-            if (window.supabaseClient) {
-                try {
-                    window.supabaseClient.auth.signOut().catch(err => console.warn(err));
-                } catch (err) {
-                    console.warn("SignOut failed during session clear:", err);
-                }
-            }
-        }
-        
         // Mark session as active for subsequent reloads in this tab
         sessionStorage.setItem('tc_session_active', 'true');
 
-        // Re-verify current session from Supabase
+        // Re-verify current session from Supabase and clear stale cached auth state.
         if (window.supabaseClient) {
             try {
                 const { data: { session } } = await window.supabaseClient.auth.getSession();
+
                 if (session && session.user) {
-                    // Fetch latest profile state from DB
                     const { data: profile, error } = await window.supabaseClient
                         .from('profiles')
                         .select('*')
                         .eq('id', session.user.id)
                         .single();
-                    
+
                     if (profile) {
                         const loggedInUser = {
                             id: session.user.id,
@@ -52,28 +40,27 @@ const B2B_AUTH = {
                         };
                         localStorage.setItem('tc_current_user', JSON.stringify(loggedInUser));
                         this.currentUser = loggedInUser;
-                    } else {
-                        // User exists in Auth but has no profile record (yet)
-                        const user = JSON.parse(localStorage.getItem('tc_current_user'));
-                        if (user && user.id !== 'admin-001') {
-                            localStorage.removeItem('tc_current_user');
-                            this.currentUser = null;
-                        }
-                    }
-                } else {
-                    // Check if current user is mock admin fallback
-                    const user = JSON.parse(localStorage.getItem('tc_current_user'));
-                    if (user && user.id !== 'admin-001') {
+                    } else if (storedUser && storedUser.id !== 'admin-001') {
                         localStorage.removeItem('tc_current_user');
                         this.currentUser = null;
                     }
+                } else if (storedUser && storedUser.id !== 'admin-001') {
+                    // No active Supabase session means cached user data is stale.
+                    localStorage.removeItem('tc_current_user');
+                    this.currentUser = null;
                 }
             } catch (err) {
                 console.error("Supabase session verification failed:", err);
+                this.currentUser = storedUser || null;
             }
+        } else {
+            this.currentUser = storedUser || null;
         }
-        
-        this.currentUser = JSON.parse(localStorage.getItem('tc_current_user')) || null;
+
+        if (this.currentUser === null && rememberMe && !sessionActive) {
+            // Keep the remembered email only; do not preserve stale auth state.
+            localStorage.removeItem('tc_current_user');
+        }
         this.setupForms();
         this.protectRoutes();
         this.renderAdminUsers();

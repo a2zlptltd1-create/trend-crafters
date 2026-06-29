@@ -2388,9 +2388,12 @@ input:valid:not(:placeholder-shown) {
     background: white;
     width: 100%;
     max-width: 600px;
+    max-height: 90vh;
     border-radius: 8px;
     box-shadow: var(--shadow-lg);
     animation: slideUp 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -2404,12 +2407,17 @@ input:valid:not(:placeholder-shown) {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1001;
 }
 
 .modal-body {
     padding: 1.5rem;
-    max-height: 80vh;
+    flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .modal-footer {
@@ -2419,6 +2427,7 @@ input:valid:not(:placeholder-shown) {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
+    flex-shrink: 0;
 }
 
 /* Dashboard Component Overrides */

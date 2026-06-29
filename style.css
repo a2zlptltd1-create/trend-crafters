@@ -710,6 +710,60 @@ section {
     }
 }
 
+/* Search Overlay Styles */
+.search-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1300;
+    background: rgba(0,0,0,0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+}
+
+.search-overlay.active { opacity: 1; visibility: visible; }
+
+.search-modal {
+    width: min(900px, 95%);
+    max-width: 1100px;
+    padding: 2.2rem;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+    backdrop-filter: blur(8px) saturate(120%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.75));
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+}
+
+.search-modal h2 { font-size: 1.4rem; color: var(--accent-navy); }
+.search-form-wrapper { display:flex; gap:0.5rem; align-items: center; }
+.search-form-wrapper input[type="search"] {
+    flex: 1;
+    padding: 1.25rem 1rem;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    border: 1px solid rgba(30,41,59,0.06);
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 6px 18px rgba(11,77,112,0.06) inset;
+}
+.search-form-wrapper button { padding: 0.95rem 1rem; border-radius: 10px; }
+
+.search-results { margin-top: 0.5rem; }
+.search-hint { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem; }
+.search-list { list-style: none; display: grid; gap: 0.5rem; max-height: 320px; overflow: auto; padding: 0; margin: 0; }
+.search-list li { display:flex; gap: 0.75rem; align-items: center; padding: 0.6rem; border-radius: 8px; background: rgba(255,255,255,0.6); cursor: pointer; }
+.search-list li img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+.search-list li .meta { display:flex; flex-direction: column; }
+.search-list li .meta .title { font-weight:700; color:var(--text-dark); }
+.search-list li .meta .subtitle { font-size:0.85rem; color:var(--text-muted); }
+
+.close-search { position: absolute; right: 1rem; top: 1rem; background: transparent; border: none; color: var(--text-dark); cursor: pointer; }
+
 section.reveal {
     opacity: 0;
     transform: translateY(40px);
@@ -844,6 +898,57 @@ section.visible .product-card:nth-child(4) { animation-delay: 0.4s; }
 }
 
 .slider-btn {
+.mobile-menu-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-white);
+    display: none; /* shown on small screens */
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.mobile-menu-toggle .icon {
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.mobile-menu-toggle .icon-close { opacity: 0; transform: scale(0.8); }
+.mobile-menu-toggle.open .icon-menu { opacity: 0; transform: scale(0.8); }
+.mobile-menu-toggle.open .icon-close { opacity: 1; transform: scale(1); }
+
+.nav-drawer {
+    position: relative;
+}
+
+/* Drawer overlay & panel for mobile */
+.nav-overlay {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .nav-drawer { position: fixed; left: -320px; top: 0; height: 100%; width: 280px; background: var(--bg-secondary); box-shadow: var(--shadow-lg); transition: left 0.28s ease; z-index: 1200; padding-top: 4.5rem; }
+    .nav-drawer .nav-links { display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem 1.25rem; }
+    .nav-drawer .nav-links a { display: block; padding: 0.75rem 1rem; color: var(--text-dark); background: transparent; border-radius: 8px; font-weight: 700; }
+    .nav-drawer .nav-links a:hover { background: rgba(11,77,112,0.06); }
+
+    .nav-icons { gap: 0.5rem; }
+    .mobile-menu-toggle { display: inline-flex; }
+
+    /* Hide top nav links in header area on mobile (we use drawer instead) */
+    .nav-links { display: none; }
+
+    /* Overlay */
+    .nav-overlay { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; visibility: hidden; transition: opacity 0.25s ease; z-index: 1100; }
+
+    /* Active/open states */
+    .mobile-nav-open .nav-drawer { left: 0; }
+    .mobile-nav-open .nav-overlay { opacity: 1; visibility: visible; }
+
+    /* When drawer is open, keep header above overlay */
+    .mobile-nav-open .sticky-nav { z-index: 1210; }
+}
     width: 45px;
     height: 45px;
     border-radius: 50%;

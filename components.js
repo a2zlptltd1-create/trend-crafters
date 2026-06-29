@@ -25,12 +25,16 @@ const SHARED_COMPONENTS = {
                 <div class="logo">
                     <a href="index.html" class="no-decoration"><span class="trend">TREND</span><span class="crafters">CRAFTERS</span></a>
                 </div>
-                <ul class="nav-links">
-                    <li><a href="index.html" id="nav-home">Home</a></li>
-                    <li><a href="shop.html" id="nav-shop">Product Catalog</a></li>
-                    <li><a href="about.html" id="nav-about">About</a></li>
-                    <li><a href="contact.html" id="nav-contact">Contact</a></li>
-                </ul>
+
+                <div class="nav-drawer">
+                    <ul class="nav-links">
+                        <li><a href="index.html" id="nav-home">Home</a></li>
+                        <li><a href="shop.html" id="nav-shop">Product Catalog</a></li>
+                        <li><a href="about.html" id="nav-about">About</a></li>
+                        <li><a href="contact.html" id="nav-contact">Contact</a></li>
+                    </ul>
+                </div>
+
                 <div class="nav-icons">
                     <a href="#" id="global-search-trigger"><i class="fa-solid fa-magnifying-glass"></i></a>
                     <div id="nav-auth-ctas" style="display: flex; gap: 1rem; align-items: center;">
@@ -38,9 +42,15 @@ const SHARED_COMPONENTS = {
                         <a href="login.html" class="btn btn-outline btn-sm" style="padding: 0.5rem 1rem;">Login</a>
                         <a href="signup.html" class="btn btn-primary btn-sm" style="padding: 0.5rem 1rem;">Apply</a>
                     </div>
-                    <a href="#" class="mobile-menu-btn" id="mobile-menu-trigger"><i class="fa-solid fa-bars"></i></a>
+
+                    <!-- Mobile hamburger toggle using inline SVG (Lucide-style icons) -->
+                    <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+                        <svg class="icon icon-menu" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        <svg class="icon icon-close" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                 </div>
             </div>
+            <div class="nav-overlay" aria-hidden="true"></div>
         </nav>
     `,
     footer: `
@@ -140,16 +150,22 @@ const SHARED_COMPONENTS = {
         </div>
 
         <!-- Search Modal -->
-        <div class="search-overlay">
-            <div class="search-modal glass animate-fade">
-                <div class="close-search"><i class="fa-solid fa-xmark"></i></div>
-                <h2>Search <span class="highlight">Collection</span></h2>
+        <div class="search-overlay" id="search-overlay" aria-hidden="true">
+            <div class="search-modal glass animate-fade" role="dialog" aria-modal="true" aria-labelledby="search-modal-title">
+                <button class="close-search" aria-label="Close search"><i class="fa-solid fa-xmark"></i></button>
+                <h2 id="search-modal-title">Search <span class="highlight">Collection</span></h2>
                 <div class="search-form-wrapper">
-                    <input type="text" id="global-search-input" placeholder="What are you looking for?">
-                    <button id="global-search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <input type="search" id="global-search-input" placeholder="Search products, SKUs, descriptions..." autocomplete="off">
+                    <button id="global-search-btn" aria-label="Start search"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
+
+                <div class="search-results" id="search-live-results" aria-live="polite">
+                    <div class="search-hint">Type to see live results. Press <strong>Esc</strong> to close.</div>
+                    <ul class="search-list" id="search-results-list"></ul>
+                </div>
+
                 <div class="search-suggestions">
-                    <span>Try:</span>
+                    <span>Popular:</span>
                     <a href="shop.html?filter=t-shirt">T-Shirts</a>
                     <a href="shop.html?filter=pants">Pants</a>
                     <a href="shop.html?filter=sneakers">Sneakers</a>
@@ -211,3 +227,14 @@ if (document.readyState === 'loading') {
 } else {
     injectComponents();
 }
+
+// Dynamically load app.js after DOM is ready so injected components can be interactive
+document.addEventListener('DOMContentLoaded', () => {
+    if (!document.getElementById('app-js-script')) {
+        const s = document.createElement('script');
+        s.id = 'app-js-script';
+        s.src = 'app.js';
+        s.defer = true;
+        document.body.appendChild(s);
+    }
+});

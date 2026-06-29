@@ -475,6 +475,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.addToCart(id, name, price, image, moq);
             }
         }
+
+        // Size Button Click Handler (Quick Add with Selected Size)
+        if (e.target.closest('.size-btn')) {
+            const sizeBtn = e.target.closest('.size-btn');
+            const selectedSize = sizeBtn.getAttribute('data-size');
+            const productId = sizeBtn.getAttribute('data-product-id');
+            const productName = sizeBtn.getAttribute('data-product-name');
+            const productPrice = sizeBtn.getAttribute('data-product-price');
+            const productImage = sizeBtn.getAttribute('data-product-image');
+            
+            // Find MOQ from product card
+            const card = sizeBtn.closest('.product-card');
+            const moq = card ? card.getAttribute('data-moq') : 1;
+            
+            // Add to cart with size information in the name
+            const nameWithSize = `${productName} (${selectedSize})`;
+            window.addToCart(productId, nameWithSize, productPrice, productImage, moq);
+            
+            // Visual feedback: highlight the clicked size button
+            sizeBtn.style.background = 'var(--accent-gold)';
+            sizeBtn.style.color = 'var(--accent-navy)';
+            setTimeout(() => {
+                sizeBtn.style.background = '';
+                sizeBtn.style.color = '';
+            }, 500);
+        }
     });
 
     // Form Submissions

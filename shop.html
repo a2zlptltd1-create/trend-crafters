@@ -301,11 +301,24 @@
 
                 grid.innerHTML = products.map(p => {
                     const uiCategory = getFilterCategory(p.category, p.name);
+                    const sizes = p.availableSizes || ['M'];
                     return `
                         <div class="product-card" data-id="${p.id}" data-category="${uiCategory}" data-moq="${p.moq}">
                             <div class="product-img">
                                 <img src="${p.image}" alt="${p.name}">
                                 <div class="product-badge" style="position: absolute; top: 1rem; left: 1rem; background: var(--accent-navy); color: white; padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">MOQ: ${p.moq}</div>
+                                ${isApproved ? `
+                                <div class="size-selector">
+                                    <div class="size-label">Select Size:</div>
+                                    <div class="size-buttons">
+                                        ${sizes.map(size => `
+                                            <button class="size-btn" data-size="${size}" data-product-id="${p.id}" data-product-name="${p.name}" data-product-price="${p.basePrice}" data-product-image="${p.image}">
+                                                ${size}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                ` : ''}
                                 ${isApproved ? `
                                 <button class="add-to-cart" aria-label="Add ${p.name} to cart">
                                     <i class="fa-solid fa-cart-plus"></i>

@@ -17,6 +17,7 @@ const B2B_PRODUCTS = {
             basePrice: 29.99,
             moq: 100,
             image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=1000',
+            availableSizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
             status: 'active'
         },
         {
@@ -27,6 +28,7 @@ const B2B_PRODUCTS = {
             basePrice: 129.99,
             moq: 50,
             image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000',
+            availableSizes: ['6', '7', '8', '9', '10', '11', '12', '13'],
             status: 'active'
         },
         {
@@ -37,6 +39,7 @@ const B2B_PRODUCTS = {
             basePrice: 59.99,
             moq: 100,
             image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1000',
+            availableSizes: ['28', '30', '32', '34', '36', '38', '40'],
             status: 'active'
         },
         {
@@ -47,6 +50,7 @@ const B2B_PRODUCTS = {
             basePrice: 199.99,
             moq: 50,
             image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1000',
+            availableSizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
             status: 'active'
         },
         {
@@ -57,6 +61,7 @@ const B2B_PRODUCTS = {
             basePrice: 24.99,
             moq: 100,
             image: 'https://images.unsplash.com/photo-1534215754734-18e55d13e346?q=80&w=1000',
+            availableSizes: ['One Size'],
             status: 'active'
         },
         {
@@ -67,6 +72,7 @@ const B2B_PRODUCTS = {
             basePrice: 24.99,
             moq: 100,
             image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1000',
+            availableSizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
             status: 'active'
         },
         {
@@ -77,6 +83,7 @@ const B2B_PRODUCTS = {
             basePrice: 89.99,
             moq: 50,
             image: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?q=80&w=1000',
+            availableSizes: ['6', '7', '8', '9', '10', '11', '12', '13'],
             status: 'active'
         }
     ],
